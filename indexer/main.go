@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
-	db "github.com/FranMT-S/Enron-Mail-Challenge-2/src/database"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/src/indexer"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/src/models"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/src/shared"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/src/workers"
+	db "github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/database"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/indexer"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/models"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/shared"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/workers"
 )
 
 func main() {

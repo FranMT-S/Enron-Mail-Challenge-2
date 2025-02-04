@@ -7,8 +7,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/src/models"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/src/shared"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/models"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/shared"
 )
 
 type IParserMail interface {

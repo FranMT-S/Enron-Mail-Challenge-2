@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/src/models"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/models"
 )
 
 var z_database *zincDatabase
