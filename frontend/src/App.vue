@@ -1,10 +1,11 @@
 <script setup lang="ts">
-  import MailsView from '@/modules/mails/MailsView.vue'
+  import MailsView from '@/modules/mails/views/MailsView.vue'
 
 </script>
 
 <template>
-    <MailsView/>
+    <RouterView />
+    <!-- <MailsView/> -->
 </template>
 
 <style scoped>
