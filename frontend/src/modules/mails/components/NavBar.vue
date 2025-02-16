@@ -1,18 +1,23 @@
 
 <script setup lang="ts">
+import { ref } from 'vue';
+import SearchBar from './SearchBar.vue';
+import LogoApp from './LogoApp.vue';
+  interface IEvents {
+    (e: 'onSearch',query:string): void
+  }
+
+  const emit = defineEmits<IEvents>()
+  const onSearch = (query:string) =>{
+    emit('onSearch',query)
+  }
 
 
 </script>
 
 <template>
-  <nav class="w-full flex p-[6px] gap-5 bg-[#5c308e] text-white ">
-      <div>
-          <img src="../../../assets/maillogo2.png" class="bg-cover bg-no-repeat h-full" />
-      </div>
-      <div class="border w-full text-center flex justify-center items-center gap-2">
-        <button class=" flex justify-center items-center h-[28px] px-[10px] rounded-lg border text-center font-bold"> search</button>
-        <input class=" focus:outline-none border p-[4px] text-center rounded-3xl text-black bg-white hover:not-focus:bg-gray-300"
-        placeholder="este es un input"/>
-      </div>
+  <nav class="w-full flex py-[6px] px-[30px]  gap-[20px]  bg-[#5c308e] text-white ">
+      <LogoApp class="scale-125 "/>
+      <SearchBar @on-search="onSearch" class="w-[50%] mx-auto"/>
   </nav>
 </template>

@@ -13,8 +13,9 @@ export const useMailService = () => {
     }
   }
 
-  const getMails = async (query:string = "", page:number = 1, size:number=  30) => {
-    abortPreviousRequest()
+  const getMails = async (query:string = "", page:number = 1, size:number=  30, isAbortPreviousRequest = true) => {
+    if(isAbortPreviousRequest)
+      abortPreviousRequest()
 
     const {response,controller:co} =  fetchGetMails(query,page,size);
     controller.value = co;
@@ -31,8 +32,9 @@ export const useMailService = () => {
     return mails
   };
 
-  const getMailByID = async (id:string) => {
-    abortPreviousRequest()
+  const getMailByID = async (id:string, isAbortPreviousRequest:boolean = true) => {
+    if(isAbortPreviousRequest)
+      abortPreviousRequest()
 
     const {response,controller:co} =  fetchGetMailByID(id);
     controller.value = co;

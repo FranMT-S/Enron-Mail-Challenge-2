@@ -4,21 +4,24 @@
 <script setup lang="ts">
 import { formatDate } from '@/helpers/formatDate';
 import type { Mail, MailSummary } from '@/models/Mails';
+import router from '@/routes';
+import { NamesRouter } from '@/routes/routesNames';
 import { computed, toRef } from 'vue';
 
-export interface MailTableProps{
+interface MailTableProps{
   mails:MailSummary[]
 }
 
 const columns = ["From","To","Subject","Date"]
-// const {mails} = withDefaults(defineProps<MailTableProps>(),{
-//   mails:() => []
-// })
-const props = defineProps<{
-  mails: MailSummary[];
-}>();
 
+const props = defineProps<MailTableProps>();
 
+const navigateToDetails = (id:string) =>{
+  router.push({
+    name:NamesRouter.MailDetail,
+    params:{id}
+  })
+}
 
 const newMails = computed(() => {
   return props.mails.map(mail => {
@@ -37,8 +40,8 @@ const newMails = computed(() => {
 
 
 <template>
-<div class="overflow-x-auto">
-        <table class="min-w-max w-full table-auto">
+<div class="overflow-x-auto h-full mb-5">
+        <table class="min-w-max w-full table-auto ">
             <thead>
                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                     <th class="py-3 px-6 text-center w-[200px]" v-for="column in columns" :key="column">
@@ -47,7 +50,8 @@ const newMails = computed(() => {
                 </tr>
             </thead>
             <tbody class="text-gray-600 text-sm font-light text-center">
-                <tr class="border-b border-gray-200 hover:bg-gray-100" v-for="mail in newMails" :key="mail.id" >
+
+              <tr @click="() => navigateToDetails(mail.id)" class="border-b border-gray-200 hover:bg-gray-100" v-for="mail in newMails" :key="mail.id" >
                     <td class="max-w-[100px]  py-3 px-6  text-center text-nowrap text-ellipsis overflow-hidden">
                         <div class="text-ellipsis overflow-hidden text-nowrap">
                             <span class="font-medium">{{ mail.from }}</span>
