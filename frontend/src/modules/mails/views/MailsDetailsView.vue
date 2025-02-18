@@ -109,7 +109,7 @@ onMounted(async () => await handlerGetMailByID(emailId))
       <section>
         <h1 class="font-bold text-2xl mb-3">{{mail?.subject ?? ""}}</h1>
         <!-- <article class="mt-8 text-gray-500 leading-7 tracking-wider"> -->
-        <article class=" text-gray-500 leading-7 break-words" v-html="mail?.body  ?? ''">
+        <article class=" text-gray-500 leading-7 whitespace-pre-wrap break-words" v-html="mail?.body  ?? ''">
 
         </article>
       </section>

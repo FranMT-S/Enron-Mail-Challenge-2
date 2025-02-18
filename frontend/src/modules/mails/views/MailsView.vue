@@ -14,7 +14,8 @@
 
   const emailsSummary = ref<MailSummary[]>([])
   const total = ref(1)
-  const query = ref("este es un ejemplo")
+  // const query = ref("este es un ejemplo")
+  const query = ref("")
   const page = ref(1)
   const totalPerPage = ref(30)
   const {getMails} = useMailService()

@@ -9,7 +9,7 @@
     (e: 'on-search',query:string): void
   }
 
-  const isFilterActive = ref(true)
+  const isFilterActive = ref(false)
   const query = ref("")
   const emit = defineEmits<IEvents>()
 

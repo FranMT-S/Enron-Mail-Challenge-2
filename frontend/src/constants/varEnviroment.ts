@@ -4,3 +4,8 @@ export const URL_ENDPOINTS = {
   GetMail:`${API_URL}/mails?`,
   GetMails:`${API_URL}/mails/`
 }
+
+export const IS_DEV =  import.meta.env.PROD
+export const IS_PROD =  import.meta.env.DEV
+export const PORT =  import.meta.env.VITE_PORT
+
