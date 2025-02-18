@@ -1,6 +1,7 @@
 
 services:
   zinc:
+    restart: on-failure:3
     image: public.ecr.aws/zinclabs/zincsearch:0.4.10
     container_name: zincsearch
     environment:
@@ -11,6 +12,7 @@ services:
       - "4080:4080"
     volumes:
       - zinc_data:/data
+    
 volumes:
   zinc_data:
   

@@ -5,10 +5,9 @@ import (
 	"io"
 	"os"
 	"strings"
-	"sync"
 
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/models"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/shared"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/models"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/shared"
 )
 
 type IParserMail interface {
@@ -18,30 +17,27 @@ type IParserMail interface {
 type MimeParse struct {
 }
 
-var poolMails = &sync.Pool{
-	New: func() interface{} {
-		// Función que se ejecuta cuando no hay objetos disponibles en el pool
-		return &models.Email{}
-	},
-}
+// var poolMails = &sync.Pool{
+// 	New: func() interface{} {
+// 		// Función que se ejecuta cuando no hay objetos disponibles en el pool
+// 		return &models.Email{}
+// 	},
+// }
 
 func (parser *MimeParse) ConvertFileToMail(file *os.File) (*models.Email, error) {
-	var partialLine string
-	var lastField string
-	mail := poolMails.Get().(*models.Email)
+	var lastFieldUpdated string
+	// mail := poolMails.Get().(*models.Email)
+	mail := &models.Email{}
 	isHeader := true
 	KB := 4
 
 	buffer := make([]byte, KB*1024)
-	// fmt.Println("-----------Initial CHUNK-----------")
 	for {
 		numBytes, err := file.Read(buffer)
 		if err == io.EOF {
-			if len(partialLine) > 0 {
-				fmt.Println(partialLine)
-			}
 			break
 		}
+
 		if err != nil {
 			return nil, err
 		}
@@ -49,32 +45,31 @@ func (parser *MimeParse) ConvertFileToMail(file *os.File) (*models.Email, error)
 		chunk := string(buffer[:numBytes])
 
 		if isHeader {
-			processChunk(chunk, mail, &lastField, &isHeader)
+			err := processChunk(chunk, mail, &lastFieldUpdated, &isHeader)
+			if err != nil {
+				return nil, err
+			}
 		} else {
 			mail.Body += chunk
 		}
 	}
 
 	mail.Body = strings.TrimSpace(mail.Body)
+
 	return mail, nil
 }
 
-func processChunk(chunk string, mail *models.Email, lastField *string, isHeader *bool) (err error) {
-	// fmt.Println("-----Chunk-----------")
-	// fmt.Println(chunk)
-	// fmt.Println("-----Chunk-----------")
-	// fmt.Println()
+func processChunk(chunk string, mail *models.Email, lastFieldUpdated *string, isHeader *bool) (err error) {
+
 	lines := strings.Split(chunk, "\n")
 	var field, value string
 	for i, line := range lines {
-
-		// fmt.Println("Last Field:", *lastField)
 		if strings.TrimSpace(line) == "" {
 			*isHeader = false
 		}
 
 		if !(*isHeader) {
-			mail.Body += strings.Join(lines[i:], "")
+			mail.Body += strings.Join(lines[i:], "\n")
 			return nil
 		}
 
@@ -83,13 +78,12 @@ func processChunk(chunk string, mail *models.Email, lastField *string, isHeader 
 		if len(fields) > 1 {
 			field, value = strings.TrimSpace(fields[0]), strings.TrimSpace(fields[1])
 			field = strings.ToLower(field)
-			*lastField = field
+			*lastFieldUpdated = field
 		} else {
-			field = strings.ToLower(*lastField)
+			field = strings.ToLower(*lastFieldUpdated)
 			value = strings.TrimSpace(fields[0])
 		}
-		// fmt.Println("Field:", field, ",Value:", value)
-		// fmt.Println()
+
 		switch field {
 		case "message-id":
 			mail.MessageID += value

@@ -1,9 +1,10 @@
 package indexer
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/src/models"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/models"
 )
 
 type IMailIndexer interface {
@@ -13,6 +14,28 @@ type IMailIndexer interface {
 
 type Indexer struct {
 	MailParser IParserMail
+}
+
+func NewMimeIndexer() Indexer {
+	return Indexer{
+		MailParser: &MimeParse{},
+	}
+}
+
+func (indexer *Indexer) IndexMail(FilePath string) (*models.Email, error) {
+	file, err := os.Open(FilePath)
+	if err != nil {
+		fmt.Println(FilePath)
+		return nil, err
+	}
+
+	defer file.Close()
+
+	mail, err := indexer.MailParser.ConvertFileToMail(file)
+	if err != nil {
+		fmt.Println(FilePath)
+	}
+	return mail, err
 }
 
 func (indexer *Indexer) IndexMails(FilesPathQueoeCh chan string, MailsResultQueoe chan *models.Email) {
@@ -34,17 +57,4 @@ func (indexer *Indexer) IndexMails(FilesPathQueoeCh chan string, MailsResultQueo
 	}
 
 	close(MailsResultQueoe)
-}
-
-func (indexer *Indexer) IndexMail(FilePath string) (*models.Email, error) {
-	file, err := os.Open(FilePath)
-	if err != nil {
-		return nil, err
-	}
-
-	defer file.Close()
-
-	mail, _ := indexer.MailParser.ConvertFileToMail(file)
-
-	return mail, nil
 }

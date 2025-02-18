@@ -1,6 +1,8 @@
 package workers
 
-import "sync"
+import (
+	"sync"
+)
 
 type Worker[In any, Out any] struct {
 	id            int
@@ -9,6 +11,8 @@ type Worker[In any, Out any] struct {
 	resultQueueCh chan<- Out
 	errorCh       chan error
 	wg            *sync.WaitGroup
+	successTask   int
+	failedTask    int
 }
 
 func NewWorker[In any, Out any](
@@ -35,13 +39,18 @@ func (wo *Worker[In, Out]) Start() {
 
 	for task := range wo.taskQueueCh {
 		result, err := wo.job(task)
-		if err != nil && wo.errorCh != nil {
-			wo.errorCh <- err
+		if err != nil {
+			wo.failedTask++
+			if wo.errorCh != nil {
+				wo.errorCh <- err
+			}
 			continue
 		}
 
 		if wo.resultQueueCh != nil {
 			wo.resultQueueCh <- result
 		}
+		wo.successTask++
 	}
+	// fmt.Printf("worker %v end job\n", wo.id)
 }

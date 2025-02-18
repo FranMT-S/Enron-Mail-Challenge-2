@@ -5,8 +5,8 @@ type Email struct {
 	Date                    string `json:"date"`
 	From                    string `json:"from"`
 	To                      string `json:"to"`
-	Bcc                     string `json:"Bcc"`
-	Cc                      string `json:"Cc"`
+	Bcc                     string `json:"bcc"`
+	Cc                      string `json:"cc"`
 	Subject                 string `json:"subject"`
 	MimeVersion             string `json:"mime_version"`
 	ContentType             string `json:"content_type"`
