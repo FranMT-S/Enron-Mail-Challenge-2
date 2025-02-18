@@ -15,8 +15,6 @@ import (
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/workers"
 )
 
-var _time = time.Now().Format("010206_030405")
-
 func main() {
 	config.LoadConfig()
 	var wg sync.WaitGroup
@@ -24,6 +22,7 @@ func main() {
 	zincDb := db.ZincDatabase()
 	zincDb.CreateIndex(config.CFG.DatabaseName)
 	mailsQueoeCh := make(chan *models.Email)
+	mailsBatchQueoeCh := make(chan []*models.Email)
 	profiler := profiling.Profiler{}
 
 	errorHandler := apperrors.NewErrorHandler()
@@ -42,9 +41,10 @@ func main() {
 
 	filesQueoCh := make(chan string)
 
+	semaphore := shared.NewSemaphore(50)
 	wg.Add(1)
 	go func() {
-		shared.FindFilesAsync("../mails/mailsdir", filesQueoCh, &wg)
+		shared.FindFilesAsync("../mails/mailsdir", filesQueoCh, &wg, semaphore)
 		wg.Wait()
 		close(filesQueoCh)
 	}()
@@ -53,24 +53,32 @@ func main() {
 	workerpool := workers.NewWorkerPool(
 		mimeIndexer.IndexMail,
 		filesQueoCh,
-		workers.WorkerPoolConfig[*models.Email]{
-			Workers:     20,
-			ResultQueue: mailsQueoeCh,
-			ErrorCh:     errorHandler.GetErrCh(),
+		mailsQueoeCh,
+		workers.WorkerPoolConfig{
+			Workers: 20,
+			ErrorCh: errorHandler.GetErrCh(),
 		},
 	)
-
 	workerpool.SetName("Indexer Mails")
 	workerpool.Start()
 
-	var wgBatch sync.WaitGroup
+	var wgBatchMails sync.WaitGroup
+	var wgUploader sync.WaitGroup
 
-	wgBatch.Add(1)
-	go indexer.PoolMailBatch(mailsQueoeCh, &wgBatch)
+	go indexer.BatchQueoue(1000, mailsQueoeCh, mailsBatchQueoeCh, &wgBatchMails)
+	go indexer.UploaderPool(
+		4,
+		config.CFG.DatabaseName,
+		db.ZincDatabase(),
+		mailsBatchQueoeCh,
+		errorHandler.GetErrCh(),
+		&wgUploader,
+	)
 
 	workerpool.Wait()
+	wgBatchMails.Wait()
+	wgUploader.Wait()
 	errorHandler.CloseAndWait()
-	wgBatch.Wait()
 	workerpool.PrintSuccesfulTask()
 
 	if config.IS_PROFILER {

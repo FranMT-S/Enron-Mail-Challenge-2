@@ -1,0 +1,18 @@
+
+services:
+  zinc:
+    restart: on-failure:3
+    image: public.ecr.aws/zinclabs/zincsearch:0.4.10
+    container_name: zincsearch
+    environment:
+      ZINC_FIRST_ADMIN_USER: "admin"
+      ZINC_FIRST_ADMIN_PASSWORD: "Complexpass#123"
+      ZINC_DATA_PATH: "/data"
+    ports:
+      - "4080:4080"
+    volumes:
+      - zinc_data:/data
+    
+volumes:
+  zinc_data:
+  

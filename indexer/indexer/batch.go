@@ -40,7 +40,7 @@ func (bm *BatchManager) SubmitAndSend(indexName string, mail *models.Email) erro
 	if len(bm.mails) >= bm.LimitBatch {
 		bm.postSended++
 		fmt.Println("Batch Manager ", bm.id, " sended batch: ", bm.postSended)
-		// err = bm.post.PostMails(indexName, bm.mails)
+		err = bm.post.PostMails(indexName, bm.mails)
 		bm.mails = nil
 	}
 
