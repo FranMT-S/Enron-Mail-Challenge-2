@@ -10,19 +10,12 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/config"
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 )
-
-type IndexDB interface {
-	SearchMails2(query string, page int, size int, fields []string) (*models.Hits[models.Email], *apierrors.ResponseError)
-	SearchMails(query models.Query) (*models.Hits[models.Email], *apierrors.ResponseError)
-	SearchMail(id string) (*models.Hit[models.Email], *apierrors.ResponseError)
-}
 
 type zinchsearchDB struct {
 	client *http.Client
@@ -48,33 +41,6 @@ func NewZinchSearchDB() *zinchsearchDB {
 			Timeout:   30 * time.Second,
 		},
 	}
-}
-
-func (zin *zinchsearchDB) SearchMails2(query string, page int, size int, fields []string) (*models.Hits[models.Email], *apierrors.ResponseError) {
-	url := config.ZINC_SEARCH_URL
-
-	getAllQuery, errRes := getAllMailsQuery(page, size, fields)
-	if errRes != nil {
-		return nil, errRes
-	}
-
-	reader := strings.NewReader(getAllQuery)
-
-	res, errRes := zin.doRequest("POST", url, reader)
-	if errRes != nil {
-		return nil, errRes
-	}
-
-	var HitsResponse *models.Hits[models.Email]
-	defer res.Body.Close()
-
-	err := json.NewDecoder(res.Body).Decode(&HitsResponse)
-	if err != nil {
-		errRes := apierrors.ErrResponseFailedProcessingQuery.WithLogError(err)
-		return nil, errRes
-	}
-
-	return HitsResponse, nil
 }
 
 func (zin *zinchsearchDB) SearchMails(query models.Query) (*models.Hits[models.Email], *apierrors.ResponseError) {

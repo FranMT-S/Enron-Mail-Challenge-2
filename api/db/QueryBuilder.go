@@ -12,6 +12,8 @@ import (
 
 func QueryBuilder(queryString string, page, size int, fields []string, timeZone string) (*models.Query, *apierrors.ResponseError) {
 	QueryModel := models.NewQuery()
+	from := (page - 1) * size
+	QueryModel.SetFields(fields).SetSize(size).SetFrom(from)
 	if queryString == "" {
 		QueryModel.SetGetAllQuery()
 		return QueryModel, nil
@@ -19,25 +21,23 @@ func QueryBuilder(queryString string, page, size int, fields []string, timeZone 
 
 	fieldInnerParenthesesRegex := `\([^)]+\)`
 	fieldRegex := fmt.Sprintf(`\w+:(%v|\S+)`, fieldInnerParenthesesRegex)
+	searchFieldsExpresionRegex := regexp.MustCompile(fieldRegex)
 
-	regex := regexp.MustCompile(fieldRegex)
-
-	query := regex.ReplaceAllString(queryString, "")
-	query = cleanValue(query)
-
-	fieldsExpresionList := regex.FindAllString(queryString, -1)
-	QueryModel.AddQueryString(query)
+	fieldsExpresionList := searchFieldsExpresionRegex.FindAllString(queryString, -1)
 	if errRes := processAndAddFilteringQueries(QueryModel, fieldsExpresionList, timeZone); errRes != nil {
 		return nil, errRes
 	}
-	fmt.Println(fields)
-	QueryModel.SetFields(fields)
+
+	query := searchFieldsExpresionRegex.ReplaceAllString(queryString, "")
+	query = cleanValue(query)
+
+	QueryModel.AddQueryString(query)
 	return QueryModel, nil
 }
 
 func cleanValue(s string) string {
 	s = strings.TrimSpace(s)
-	s = strings.ReplaceAll(s, ":", "")
+	// s = strings.ReplaceAll(s, ":", "")
 	s = strings.ReplaceAll(s, "(", "")
 	s = strings.ReplaceAll(s, ")", "")
 	return s
@@ -71,15 +71,20 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 
 			rangeFilter.Range.Date.LessThanOrEquals = &date
 		default:
-			Query.AddMatchField(key, value)
+			Query.AddMatchFieldFilter(key, value)
 		}
 	}
 
-	rangeFilter.Range.Date.Format = time.RFC3339
-
-	Query.AddRangeFilter(rangeFilter)
+	if !isEmptyDateRange(rangeFilter) {
+		rangeFilter.Range.Date.Format = time.RFC3339
+		Query.AddRangeFilter(rangeFilter)
+	}
 
 	return nil
+}
+
+func isEmptyDateRange(dr models.DateRange) bool {
+	return dr == models.DateRange{}
 }
 
 func dateParsed(layout, value, timeZone string) (time.Time, *apierrors.ResponseError) {

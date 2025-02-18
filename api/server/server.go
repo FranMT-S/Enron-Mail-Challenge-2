@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/config"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/controllers"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/db"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/middlewares"
@@ -56,6 +57,13 @@ func (server *Server) setupRoutes() {
 
 	api := chi.NewRouter()
 	api.Mount("/mails", routes.MailsRouter(server.emailController))
+
+	if config.IS_DEVELOPMENT {
+		api.Route("/test", func(r chi.Router) {
+			r.Use(middlewares.Paginator)
+			r.Get("/query", controllers.TestQueryBuilderfunc)
+		})
+	}
 
 	server.router.Mount("/api", api)
 	server.router.Get("/", func(w http.ResponseWriter, r *http.Request) {

@@ -54,7 +54,7 @@ func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size in
 		return nil, err
 	}
 
-	var emails []models.EmailSummary
+	emails := []models.EmailSummary{}
 
 	total := hits.Hits.Total.Value
 	for _, hit := range hits.Hits.Hits {

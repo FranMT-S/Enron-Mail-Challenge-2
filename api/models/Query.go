@@ -23,15 +23,6 @@ type Query struct {
 	Highlight *HighlightQuery `json:"highlight,omitempty"`
 }
 
-type QueryField struct {
-	Bool BoolQuery `json:"bool"`
-}
-
-type BoolQuery struct {
-	Must        []any       `json:"must"`
-	RangeFilter []DateRange `json:"filter,omitempty"`
-}
-
 func NewQuery() *Query {
 	copyHighLight := _default_hightlight
 	return &Query{
@@ -44,7 +35,7 @@ func NewQuery() *Query {
 		},
 		From:      0,
 		Size:      _default_size,
-		Sort:      []string{"date"},
+		Sort:      []string{"-date"},
 		Highlight: &copyHighLight,
 	}
 }
@@ -85,7 +76,12 @@ func (zb *Query) SetQueryString(query string) *Query {
 	return zb
 }
 
+// if query is empty return same Query
 func (zb *Query) AddQueryString(query string) *Query {
+	if query == "" {
+		return zb
+	}
+
 	queryString := SearchQueryString{
 		QueryString: QueryString{
 			Query: query,
@@ -102,7 +98,7 @@ func (zb *Query) AddRangeFilter(dateRange DateRange) *Query {
 	return zb
 }
 
-func (zb *Query) AddMatchField(key, value string) *Query {
+func (zb *Query) AddMatchFieldFilter(key, value string) *Query {
 	field := make(map[string]string, 0)
 	field[key] = value
 	matchField := SearchMatch{
@@ -119,6 +115,15 @@ func (zb *Query) SetGetAllQuery() *Query {
 	zb.Query.Bool.Must = []any{queryGetAll}
 
 	return zb
+}
+
+type QueryField struct {
+	Bool BoolQuery `json:"bool"`
+}
+
+type BoolQuery struct {
+	Must        []any       `json:"must"`
+	RangeFilter []DateRange `json:"filter,omitempty"`
 }
 
 type SearchQueryString struct {

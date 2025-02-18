@@ -15,6 +15,7 @@ var (
 	ZINC_URL_API          string
 	ZINC_GET_DOCUMENT_URL string
 	ZINC_SEARCH_URL       string
+	IS_DEVELOPMENT        bool = false
 )
 
 type Config struct {
@@ -45,6 +46,8 @@ func loadEnv() {
 		ServerPort:       getEnv("SERVER_PORT"),
 		AllowedOrigins:   getEnv("ALLOWED_ORIGINS"),
 	}
+
+	IS_DEVELOPMENT = os.Getenv("APP_ENV") == "development"
 
 	ZINC_URL_API = CFG.DatabaseHost + ":" + CFG.DatabasePort
 	ZINC_SEARCH_URL = fmt.Sprintf("%v/es/%v/_search", ZINC_URL_API, CFG.DatabaseName)

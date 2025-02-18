@@ -5,14 +5,6 @@ import (
 	"net/http"
 )
 
-const (
-	ERROR_DATA_BASE_REQUEST    = "internal error: There was an error in the database request"
-	ERROR_CREATE_REQUEST_FAILD = "failed to create HTTP request"
-	ERROR_DO_REQUEST_FAILD     = "failed to do HTTP request"
-	ERROR_INVALID_DATA_ENTERED = "the data entered or the query form is not valid"
-	ERROR_SERIALIZED_FIELDS    = "there was a error when processing the fields"
-)
-
 var (
 	ErrDataBaseRequest     = fmt.Errorf("the request could not be created")
 	ErrCreateRequestFailed = fmt.Errorf("failed to create HTTP request")
@@ -49,7 +41,7 @@ var (
 	)
 
 	ErrResponseRequestTimeOut = NewResponseError(
-		http.StatusGatewayTimeout,
+		http.StatusRequestTimeout,
 		"The server took too much to respond. Try again later",
 		"RequestTimeOutError",
 		ErrTimeoutError,
@@ -67,5 +59,12 @@ var (
 		"The server is not temporarily available. Try again later",
 		"DataBaseNotConnectionError",
 		ErrConnectionClosed,
+	)
+
+	ErrResponseRequestCancelled = NewResponseError(
+		http.StatusRequestTimeout,
+		"Request canceled",
+		"RequestCancelledError",
+		nil,
 	)
 )

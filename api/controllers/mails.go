@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"fmt"
-	"math/rand"
+	"context"
 	"net/http"
-	"time"
 
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/helpers"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/middlewares"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -28,52 +27,62 @@ func NewMailController(emailService services.IMailService) *MailController {
 }
 
 func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query().Get("query")
-	page, err := middlewares.Paginator.GetPageFromContext(r)
-	timeZone := helpers.GetTimeZone(r)
+	errCh := make(chan *apierrors.ResponseError)
+	resCh := make(chan *models.EmailSummaryResponse)
+	ctx := r.Context()
 
-	if err != nil {
-		apierrors.RenderJSON(w, err)
-		return
-	}
+	go func() {
+		query := r.URL.Query().Get("query")
+		timeZone := helpers.GetTimeZone(r)
+		page, err := middlewares.Paginator.GetPageFromContext(r)
+		if err != nil {
+			errCh <- err
+			return
+		}
 
-	size, err := middlewares.Paginator.GetSizeFromContext(r)
-	if err != nil {
-		apierrors.RenderJSON(w, err)
-		return
-	}
+		size, err := middlewares.Paginator.GetSizeFromContext(r)
+		if err != nil {
+			errCh <- err
+			return
+		}
 
-	hits, err := mc.emailService.GetMailsHitsAndTotal(query, page, size, timeZone)
-	if err != nil {
-		apierrors.RenderJSON(w, err)
-		return
-	}
+		// time.Sleep(time.Duration(5) * time.Second)
+		hits, err := mc.emailService.GetMailsHitsAndTotal(query, page, size, timeZone)
+		if err != nil {
+			errCh <- err
+			return
+		}
 
-	render.JSON(w, r, hits)
+		resCh <- hits
+	}()
+
+	response(resCh, errCh, ctx, w, r)
 }
 
 func (mc MailController) GetMail(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	hits, err := mc.emailService.GetMailByID(id)
-	if err != nil {
-		apierrors.RenderJSON(w, err)
-		return
-	}
+	errCh := make(chan *apierrors.ResponseError)
+	resCh := make(chan *models.Email)
+	ctx := r.Context()
+	go func() {
+		id := chi.URLParam(r, "id")
+		hits, err := mc.emailService.GetMailByID(id)
+		if err != nil {
+			errCh <- err
+			return
+		}
+		resCh <- hits
+	}()
 
-	render.JSON(w, r, hits)
+	response(resCh, errCh, ctx, w, r)
 }
 
-func LongRequestHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	min := 2
-	max := 7
-	randomInt := rand.Intn(max+1-min) + min
+func response[T any](responseCh chan T, errCh chan *apierrors.ResponseError, ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	select {
-	case <-time.After(time.Duration(randomInt) * time.Second): // Simula una tarea larga
-		fmt.Println("Test Proceso completado ", randomInt)
-		fmt.Fprintln(w, fmt.Sprintf("Test Proceso completado %v", randomInt))
-	case <-ctx.Done(): // Maneja la cancelación de la petición
-		http.Error(w, "Petición cancelada", http.StatusRequestTimeout)
+	case hits := <-responseCh:
+		render.JSON(w, r, hits)
+	case err := <-errCh:
+		apierrors.RenderJSON(w, err)
+	case <-ctx.Done():
+		apierrors.RenderJSON(w, apierrors.ErrResponseRequestCancelled)
 	}
 }
