@@ -1,0 +1,24 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: production 
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    ports:
+      - "${VITE_PORT}:80"
+    container_name: mails_app
+    image: mails_app
+    environment:
+      - NODE_ENV=production
+    restart: on-failure
+    env_file:
+      - .env
+    networks:
+      - mails-network
+    
+networks:
+  mails-network:
+    external: true
+    driver: bridge

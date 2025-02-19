@@ -1,0 +1,27 @@
+FROM node:20.12 AS base
+
+RUN mkdir -p /app
+WORKDIR /app
+COPY  package*.json ./
+ARG VITE_API_URL 
+ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_PORT 
+ENV VITE_PORT=$VITE_PORT
+RUN echo "VITE_API_URL=$VITE_API_URL"  
+RUN npm install
+
+FROM base AS build
+ENV NODE_ENV=production
+COPY . /app
+RUN npm run build
+
+FROM nginx:1.25.4-alpine-slim AS production
+ENV NODE_ENV=production
+RUN rm -r /usr/share/nginx/html/*
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE $VITE_PORT
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

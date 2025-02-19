@@ -12,6 +12,13 @@ services:
       - "4080:4080"
     volumes:
       - zinc_data:/data
+    networks:
+      - mails-network
+    
+networks:
+  mails-network:
+    external: true
+    driver: bridge
     
 volumes:
   zinc_data:

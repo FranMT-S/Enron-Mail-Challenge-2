@@ -2,6 +2,7 @@ import { API_URL } from "@/constants/varEnviroment";
 import { fetchCustom } from "@/helpers/fetch";
 
 
+console.log(API_URL);
 const baseURl = new URL(API_URL + "/")
 
 export function fetchGetMails(query:string = "", page:number = 1, size:number=  30){
