@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -33,8 +32,11 @@ func LoadConfig() {
 }
 
 func loadEnv() {
-	if err := godotenv.Load(); err != nil {
-		log.Printf("Warning: .env file not found\n")
+	if os.Getenv("APP_MODE") != "release" {
+		err := godotenv.Load()
+		if err != nil {
+			panic(".env not found")
+		}
 	}
 
 	CFG = &Config{
@@ -47,7 +49,7 @@ func loadEnv() {
 		AllowedOrigins:   getEnv("ALLOWED_ORIGINS"),
 	}
 
-	IS_DEVELOPMENT = os.Getenv("APP_ENV") == "development"
+	IS_DEVELOPMENT = os.Getenv("APP_MODE") == "development"
 
 	ZINC_URL_API = CFG.DatabaseHost + ":" + CFG.DatabasePort
 	ZINC_SEARCH_URL = fmt.Sprintf("%v/es/%v/_search", ZINC_URL_API, CFG.DatabaseName)
@@ -56,7 +58,7 @@ func loadEnv() {
 
 func getEnv(key string) string {
 	if value := os.Getenv(key); value != "" {
-		fmt.Printf("Environment variable %v is set. %v\n", key, value)
+		// fmt.Printf("Environment variable %v is set. %v\n", key, value)
 		return value
 	}
 

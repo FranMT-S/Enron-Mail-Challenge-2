@@ -1,0 +1,20 @@
+
+
+networks:
+  my_network:  # Definir una red interna compartida
+    driver: bridge
+
+services:
+  api:
+    extends:
+      file: ./api/docker-compose-local.yml
+      service: api
+    networks:
+      - my_network
+
+  app:
+    extends:
+      file: ./frontend/docker-compose.yml
+      service: app
+    networks:
+      - my_network

@@ -66,6 +66,7 @@ func (server *Server) setupRoutes() {
 	}
 
 	server.router.Mount("/api", api)
+
 	server.router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Server Working"))
 	})
