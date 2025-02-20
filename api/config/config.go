@@ -58,10 +58,10 @@ func loadEnv() {
 
 func getEnv(key string) string {
 	if value := os.Getenv(key); value != "" {
-		// fmt.Printf("Environment variable %v is set. %v\n", key, value)
+		fmt.Printf("Environment variable %v is set. %v\n", key, value)
 		return value
 	}
 
-	fmt.Printf("Environment variable %v is not set.\n", key)
+	// fmt.Printf("Environment variable %v is not set.\n", key)
 	panic("Environment variable " + key + " is not set.\n")
 }

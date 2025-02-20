@@ -5,11 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/config"
@@ -57,6 +56,7 @@ func (zin *zinchsearchDB) SearchMails(query models.Query) (*models.Hits[models.E
 	reader := bytes.NewReader(bytesJson)
 
 	res, errRes := zin.doRequest("POST", url, reader)
+
 	if errRes != nil {
 		return nil, errRes
 	}
@@ -71,6 +71,11 @@ func (zin *zinchsearchDB) SearchMails(query models.Query) (*models.Hits[models.E
 	}
 
 	return HitsResponse, nil
+}
+
+type ZincError struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
 
 func (zin *zinchsearchDB) SearchMail(id string) (*models.Hit[models.Email], *apierrors.ResponseError) {
@@ -103,21 +108,20 @@ func (zinDB zinchsearchDB) doRequest(method string, url string, body io.Reader) 
 	ZincHeader(req)
 
 	res, err := zinDB.client.Do(req)
+
 	if err != nil {
-		var errRes *apierrors.ResponseError
-		log.Println(err.Error())
-		if errors.Is(err, context.DeadlineExceeded) {
-			errRes = apierrors.ErrResponseRequestTimeOut
-		} else if errors.Is(err, net.ErrClosed) {
-			errRes = apierrors.ErrResponseDataBaseNotConnection
-		} else {
-			errRes = apierrors.ErrResponseRequestNotProcessed.WithLogError(err)
+		if errRes := isConnectionError(err); errRes != nil {
+			return nil, errRes.WithLogError(err)
 		}
 
-		return nil, errRes
+		return nil, apierrors.ErrResponseRequestNotProcessed.WithLogError(err)
 	}
 
 	if res.StatusCode != http.StatusOK {
+		bodyError, _ := io.ReadAll(res.Body)
+		if errRes := IsResponseErrorFromZincSearch(bodyError); errRes != nil {
+			return nil, errRes
+		}
 
 		errRes := apierrors.ErrResponseRequestNotProcessed.WithLogError(apierrors.ErrDoRequestFailed).SetStatus(res.StatusCode)
 		return nil, errRes
@@ -126,29 +130,44 @@ func (zinDB zinchsearchDB) doRequest(method string, url string, body io.Reader) 
 	return res, nil
 }
 
-func getAllMailsQuery(page, size int, fields []string) (string, *apierrors.ResponseError) {
+func isConnectionError(err error) *apierrors.ResponseError {
+	var netErr net.Error
+	var urlErr *url.Error
 
-	jsonByte, err := json.Marshal(fields)
-
-	if err != nil {
-		errRes := apierrors.ErrResponseFailedProcessingQuery.WithLogError(err)
-		return "", errRes
+	if errors.As(err, &netErr) {
+		return apierrors.ErrResponseDataBaseNotConnection
 	}
 
-	from := (page - 1) * size
-	query := fmt.Sprintf(`
-	{
-		"query": {
-				"match_all": {}
-		},
-		"sort": [
-				"-date"
-		],
-		"from": %v,
-		"size": %v,
-		"_source": %v
+	if errors.Is(err, context.DeadlineExceeded) {
+		return apierrors.ErrResponseRequestTimeOut
 	}
-`, from, size, string(jsonByte))
 
-	return query, nil
+	if errors.As(err, &urlErr) {
+		if errors.As(urlErr.Err, &netErr) {
+			return apierrors.ErrResponseDataBaseNotConnection
+		}
+	}
+
+	return nil
+}
+
+func IsResponseErrorFromZincSearch(body []byte) *apierrors.ResponseError {
+	var zincErr apierrors.ZincSearchError
+	var zincErrType apierrors.ZincSearchErrorWithType
+
+	err := json.Unmarshal(body, &zincErr)
+	if err == nil {
+		if errRes := apierrors.IsZincError(zincErr); errRes != nil {
+			return errRes
+		}
+	}
+
+	err = json.Unmarshal(body, &zincErrType)
+	if err == nil {
+		if errRes := apierrors.IsZincErrorWithType(zincErrType); errRes != nil {
+			return errRes
+		}
+	}
+
+	return nil
 }

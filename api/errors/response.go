@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/constants"
 )
 
 type ResponseError struct {
@@ -51,7 +53,7 @@ func (resErr ResponseError) SetStatus(code int) *ResponseError {
 
 func RenderJSON(w http.ResponseWriter, re *ResponseError) {
 	if re.LogError != nil {
-		log.Println(re.LogError.Error())
+		log.Println(constants.TextRed, re.LogError.Error(), constants.TextReset)
 	}
 
 	json, err := json.Marshal(re)
@@ -63,7 +65,7 @@ func RenderJSON(w http.ResponseWriter, re *ResponseError) {
 			"code":%v,
 			"message":"%v"
 		}`, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
-		log.Println(re.Error())
+		log.Println(constants.TextYellow, re.Error(), constants.TextReset)
 
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errMsg))
@@ -72,6 +74,5 @@ func RenderJSON(w http.ResponseWriter, re *ResponseError) {
 	}
 
 	w.WriteHeader(re.Status)
-
 	w.Write(json) //nolint:errcheck
 }

@@ -1,21 +1,21 @@
 package apierrors
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 )
 
 var (
-	ErrDataBaseRequest     = fmt.Errorf("the request could not be created")
-	ErrCreateRequestFailed = fmt.Errorf("failed to create HTTP request")
-	ErrDoRequestFailed     = fmt.Errorf("failed to do HTTP request")
-	ErrRequestFailed       = fmt.Errorf("HTTP request failed")
-	ErrInvalidDataEntered  = fmt.Errorf("the data entered or the query form is not valid")
-	ErrSerializedFields    = fmt.Errorf("there was a error when processing the fields")
-	ErrPaginatorNotIsSetup = fmt.Errorf("paginator middleware is not setup")
-	ErrPaginatorSize       = fmt.Errorf("paginator middleware is not setup")
-	ErrTimeoutError        = fmt.Errorf("the request took too long to process")
-	ErrConnectionClosed    = fmt.Errorf("the connection was closed before the request could be completed")
+	ErrDataBaseRequest     = errors.New("the request could not be created")
+	ErrCreateRequestFailed = errors.New("failed to create HTTP request")
+	ErrDoRequestFailed     = errors.New("failed to do HTTP request")
+	ErrRequestFailed       = errors.New("HTTP request failed")
+	ErrInvalidDataEntered  = errors.New("the data entered or the query form is not valid")
+	ErrSerializedFields    = errors.New("there was a error when processing the fields")
+	ErrPaginatorNotIsSetup = errors.New("paginator middleware is not setup")
+	ErrPaginatorSize       = errors.New("paginator middleware is not setup")
+	ErrTimeoutError        = errors.New("the request took too long to process")
+	ErrConnectionClosed    = errors.New("the connection was closed before the request could be completed")
 )
 
 var (
@@ -65,6 +65,27 @@ var (
 		http.StatusRequestTimeout,
 		"Request canceled",
 		"RequestCancelledError",
+		nil,
+	)
+
+	ErrResponseMailNotFound = NewResponseError(
+		http.StatusNotFound,
+		"No mail was found",
+		"MailNotFoundError",
+		nil,
+	)
+
+	ErrResponseIndexNotFound = NewResponseError(
+		http.StatusInternalServerError,
+		"There are issues connecting to the server. Please contact technical support",
+		"IndexNotFound",
+		nil,
+	)
+
+	ErrResponseFaildParsedError = NewResponseError(
+		http.StatusBadRequest,
+		"The submitted query is not valid",
+		"FailedParsedField",
 		nil,
 	)
 )
