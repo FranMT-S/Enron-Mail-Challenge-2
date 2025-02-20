@@ -17,7 +17,7 @@ import (
 
 func main() {
 	config.LoadConfig()
-	var wg sync.WaitGroup
+	var wg, wgBatchMails, wgUploader sync.WaitGroup
 
 	zincDb := db.ZincDatabase()
 	zincDb.CreateIndex(config.CFG.DatabaseName)
@@ -44,7 +44,7 @@ func main() {
 	semaphore := shared.NewSemaphore(50)
 	wg.Add(1)
 	go func() {
-		shared.FindFilesAsync("../mails/mailsdir", filesQueoCh, &wg, semaphore)
+		shared.FindFilesAsync("../mails/mails100", filesQueoCh, &wg, semaphore)
 		wg.Wait()
 		close(filesQueoCh)
 	}()
@@ -61,9 +61,6 @@ func main() {
 	)
 	workerpool.SetName("Indexer Mails")
 	workerpool.Start()
-
-	var wgBatchMails sync.WaitGroup
-	var wgUploader sync.WaitGroup
 
 	go indexer.BatchQueoue(1000, mailsQueoeCh, mailsBatchQueoeCh, &wgBatchMails)
 	go indexer.UploaderPool(
