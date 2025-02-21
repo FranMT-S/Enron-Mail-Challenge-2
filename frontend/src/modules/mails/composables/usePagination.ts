@@ -9,7 +9,12 @@ export const usePagination = (
   if(Total.value < 1 )
     Total.value = 1
 
-  const totalPages = computed(() => Math.ceil(Total.value / itemsPerPage.value));
+  const totalPages = computed(() => {
+    if(Total.value == 0)
+      return 1
+
+    return Math.ceil(Total.value / itemsPerPage.value)
+  });
   if(InitialPage.value > totalPages.value)
     InitialPage.value = totalPages.value
 
@@ -18,7 +23,7 @@ export const usePagination = (
 
   const currentPage = ref(InitialPage.value)
   const currentFrom = computed(() => {
-    const page = currentPage.value -1
+    const page = currentPage.value - 1
     return page == 0 ? 1 : page * itemsPerPage.value
   })
 
