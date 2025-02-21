@@ -1,6 +1,3 @@
-
-
-
 <script setup lang="ts">
 import { formatDate } from '@/helpers/formatDate';
 import type { Mail, MailSummary } from '@/models/Mails';
@@ -40,10 +37,10 @@ const newMails = computed(() => {
 
 
 <template>
-<div class="overflow-x-auto h-full mb-5">
+<div class="overflow-x-auto h-full mb-5 pr-[5px] rounded-t-[10px]">
         <table class="min-w-max w-full table-auto ">
-            <thead>
-                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+            <thead class="sticky top-0 bg-[#6a2485] text-[#f3b2b2]">
+                <tr class=" uppercase text-sm leading-normal">
                     <th class="py-3 px-6 text-center w-[200px]" v-for="column in columns" :key="column">
                         {{ column }}
                     </th>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { InputTypeHTMLAttribute } from 'vue';
-  const model = defineModel()
+const model = defineModel()
 
-  const {label,type,} = defineProps<{
-    label:string
-    type:InputTypeHTMLAttribute
-  }>()
+const {label,type,} = defineProps<{
+  label:string
+  type:InputTypeHTMLAttribute
+}>()
 
-  const isDate = type == 'date' || type == 'datetime-local'
+const isDate = type == 'date' || type == 'datetime-local'
 
 </script>
 

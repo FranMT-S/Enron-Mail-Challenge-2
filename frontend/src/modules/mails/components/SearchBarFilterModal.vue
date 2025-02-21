@@ -1,57 +1,57 @@
 <script setup lang="ts">
-  import SearchBarFilterFieldInput from './SearchBarFilterFieldInput.vue';
-  import { ref } from 'vue';
-  import { useClickOutside } from '../composables/useClickOutside';
+import SearchBarFilterFieldInput from './SearchBarFilterFieldInput.vue';
+import { ref } from 'vue';
+import { useClickOutside } from '../composables/useClickOutside';
 
-  export interface IFilterFormData {
-    from?:string,
-    to?:string,
-    subject?:string,
-    startDate?:Date,
-    endDate?:Date,
+export interface IFilterFormData {
+  from?:string,
+  to?:string,
+  subject?:string,
+  startDate?:Date,
+  endDate?:Date,
+}
+
+
+interface IEvents {
+  (e: 'on-close',isActive:boolean): void
+  (e: 'on-submit',data:IFilterFormData): void
+}
+
+interface Props {
+  isActive:boolean
+}
+
+const {isActive} = defineProps<Props>()
+const emit = defineEmits<IEvents>()
+const formData = ref<IFilterFormData>({
+  from:undefined,
+  to:undefined,
+  subject:undefined,
+  startDate:undefined,
+  endDate:undefined,
+})
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (formRef.value && !formRef.value.contains(event.target as Node)) {
+    close()
   }
+};
 
+const sendData = () =>{
+  emit('on-submit',formData.value)
+  close();
+}
 
-  interface IEvents {
-    (e: 'on-close',isActive:boolean): void
-    (e: 'on-submit',data:IFilterFormData): void
-  }
+const close = () => {
+  emit('on-close',false)
+}
 
-  interface Props {
-    isActive:boolean
-  }
-
-  const {isActive} = defineProps<Props>()
-  const emit = defineEmits<IEvents>()
-  const formData = ref<IFilterFormData>({
-    from:undefined,
-    to:undefined,
-    subject:undefined,
-    startDate:undefined,
-    endDate:undefined,
-  })
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (formRef.value && !formRef.value.contains(event.target as Node)) {
-      close()
-    }
-  };
-
-  const sendData = () =>{
-    emit('on-submit',formData.value)
-    close();
-  }
-
-  const close = () => {
-    emit('on-close',false)
-  }
-
-  const {formRef} = useClickOutside(handleClickOutside)
+const {formRef} = useClickOutside(handleClickOutside)
 
 </script>
 
 <template>
-  <form ref="formRef"  @submit.prevent="sendData" v-if="isActive" class="min-h-fit w-full max-w-[600px] right-0  flex flex-col justify-center top-full absolute w-100 ">
+  <form ref="formRef"  @submit.prevent="sendData" v-if="isActive" class="min-h-fit w-full max-w-[600px] right-0  flex flex-col justify-center top-full absolute w-100 z-[300] ">
       <div class="relative  px-4 py-10 bg-white mx-8 md:mx-0 shadow rounded-lg sm:p-10 shadow-modal-1">
         <div class="max-w-md mx-auto">
           <div class="divide-y divide-gray-200">
