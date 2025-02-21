@@ -1,7 +1,7 @@
 import type { Mail } from "@/models/Mails";
 import { ref } from "vue";
 import { fetchGetMailByID, fetchGetMails } from "../services/mailservice";
-import type { ResponseMailSummary } from "@/models/Response";
+import type { IResponseError, ResponseMailSummary } from "@/models/Response";
 
 
 export const useMailService = () => {
@@ -20,6 +20,11 @@ export const useMailService = () => {
     const {response,controller:co} =  fetchGetMails(query,page,size);
     controller.value = co;
     const res  = await response
+    if(!res.ok){
+      const error: IResponseError = await res.json()
+      throw error
+    }
+
     const mails:ResponseMailSummary = await res.json()
     mails.emails = mails.emails.map(em => {
       if (!(em.date instanceof Date)){
@@ -39,6 +44,12 @@ export const useMailService = () => {
     const {response,controller:co} =  fetchGetMailByID(id);
     controller.value = co;
     const res  = await response
+
+    if(!res.ok){
+      const error: IResponseError = await res.json()
+      throw error
+    }
+
     const mail:Mail = await res.json()
     if (!(mail.date instanceof Date)){
       mail.date = new Date(mail.date)
