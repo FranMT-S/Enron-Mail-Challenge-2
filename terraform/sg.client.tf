@@ -1,6 +1,7 @@
 resource "aws_security_group" "sg_allow_client" {
   name        = "sg_allow_client"
   description = "allow connect to api"
+  vpc_id      = aws_vpc.vpc_mails.id
 
   ingress {
     from_port   = 80
@@ -21,7 +22,8 @@ resource "aws_security_group" "sg_allow_client" {
 resource "aws_security_group" "sg_egress_allow_all" {
   name        = "sg_egress_allow_all"
   description = "allow all egress trafic "
-
+  vpc_id      = aws_vpc.vpc_mails.id
+  
   egress {
     from_port   = 0
     to_port     = 0

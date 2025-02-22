@@ -1,6 +1,8 @@
 resource "aws_vpc" "vpc_mails" {
   cidr_block = "10.0.0.0/22"
-    tags = {
+  enable_dns_support = true
+  enable_dns_hostnames = true
+  tags = {
     Name = "vpc_mails"
   }
 }
