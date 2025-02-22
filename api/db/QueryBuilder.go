@@ -19,27 +19,33 @@ func QueryBuilder(queryString string, page, size int, fields []string, timeZone 
 		return QueryModel, nil
 	}
 
-	fieldInnerParenthesesRegex := `\([^)]+\)`
-	fieldRegex := fmt.Sprintf(`\w+:(%v|\S+)`, fieldInnerParenthesesRegex)
+	valueInnerParentheses := `\([^)]+\)`
+	NameFieldWithSpecialCharacters := `[-*]?\w+`
+
+	fieldRegex := fmt.Sprintf(`%v:(%v|\S+)`, NameFieldWithSpecialCharacters, valueInnerParentheses)
+
 	searchFieldsExpresionRegex := regexp.MustCompile(fieldRegex)
 
-	fieldsExpresionList := searchFieldsExpresionRegex.FindAllString(queryString, -1)
-	if errRes := processAndAddFilteringQueries(QueryModel, fieldsExpresionList, timeZone); errRes != nil {
+	matchFieldsExpresionList := searchFieldsExpresionRegex.FindAllString(queryString, -1)
+
+	if errRes := processAndAddFilteringQueries(QueryModel, matchFieldsExpresionList, timeZone); errRes != nil {
 		return nil, errRes
 	}
 
 	query := searchFieldsExpresionRegex.ReplaceAllString(queryString, "")
-	query = cleanValue(query)
+	query = CleanCharacters(query)
 
 	QueryModel.AddQueryString(query)
 	return QueryModel, nil
 }
 
-func cleanValue(s string) string {
+func CleanCharacters(s string) string {
 	s = strings.TrimSpace(s)
 	// s = strings.ReplaceAll(s, ":", "")
 	s = strings.ReplaceAll(s, "(", "")
 	s = strings.ReplaceAll(s, ")", "")
+	s = strings.ReplaceAll(s, "-", "")
+	s = strings.ReplaceAll(s, "*", "")
 	return s
 }
 
@@ -48,13 +54,29 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 	layout := "2006-01-02"
 
 	for _, field := range fieldsExpresion {
+		isExclusionFilter := false
+		isOperatorOR := false
+		operator := models.AND
 		parts := strings.SplitN(field, ":", 2)
 		if len(parts) < 2 {
 			continue
 		}
 
 		key := strings.ToLower(parts[0])
-		value := cleanValue(parts[1])
+		optionsFlag := key[0:1]
+		value := CleanCharacters(parts[1])
+
+		isExclusionFilter = optionsFlag == "-"
+		isOperatorOR = optionsFlag == "*"
+		fmt.Println(optionsFlag)
+		fmt.Println("key:", key)
+		fmt.Println("key:", optionsFlag == "*")
+
+		if isOperatorOR {
+			operator = models.OR
+		}
+
+		key = CleanCharacters(key)
 
 		switch key {
 		case "before":
@@ -71,7 +93,7 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 
 			rangeFilter.Range.Date.LessThanOrEquals = &date
 		default:
-			Query.AddMatchFieldFilter(key, value)
+			Query.AddMatchFieldFilter(key, value, operator, isExclusionFilter)
 		}
 	}
 

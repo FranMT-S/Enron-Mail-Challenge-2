@@ -14,6 +14,13 @@ var _default_hightlight = HighlightQuery{
 	Fields:  make(map[string]struct{}),
 }
 
+type IOperator string
+
+var (
+	AND IOperator = "AND"
+	OR  IOperator = "OR"
+)
+
 type Query struct {
 	Query     QueryField      `json:"query"`
 	Fields    []string        `json:"_source"`
@@ -30,6 +37,7 @@ func NewQuery() *Query {
 		Query: QueryField{
 			Bool: BoolQuery{
 				Must:        make([]any, 0),
+				Not:         make([]any, 0),
 				RangeFilter: make([]DateRange, 0),
 			},
 		},
@@ -93,19 +101,26 @@ func (zb *Query) AddQueryString(query string) *Query {
 }
 
 func (zb *Query) AddRangeFilter(dateRange DateRange) *Query {
-
 	zb.Query.Bool.RangeFilter = append(zb.Query.Bool.RangeFilter, dateRange)
 	return zb
 }
 
-func (zb *Query) AddMatchFieldFilter(key, value string) *Query {
-	field := make(map[string]string, 0)
-	field[key] = value
+func (zb *Query) AddMatchFieldFilter(key, value string, operator IOperator, isExclusionFilter bool) *Query {
+	field := make(map[string]SearchMatchField, 0)
+	field[key] = SearchMatchField{
+		Operator:    operator,
+		QueryString: value,
+	}
+
 	matchField := SearchMatch{
 		Match: field,
 	}
 
-	zb.Query.Bool.Must = append(zb.Query.Bool.Must, matchField)
+	if isExclusionFilter {
+		zb.Query.Bool.Not = append(zb.Query.Bool.Must, matchField)
+	} else {
+		zb.Query.Bool.Must = append(zb.Query.Bool.Must, matchField)
+	}
 	return zb
 }
 
@@ -123,6 +138,7 @@ type QueryField struct {
 
 type BoolQuery struct {
 	Must        []any       `json:"must"`
+	Not         []any       `json:"must_not"`
 	RangeFilter []DateRange `json:"filter,omitempty"`
 }
 
@@ -135,7 +151,12 @@ type QueryString struct {
 }
 
 type SearchMatch struct {
-	Match map[string]string `json:"match"`
+	Match map[string]SearchMatchField `json:"match"`
+}
+
+type SearchMatchField struct {
+	Operator    IOperator `json:"operator"`
+	QueryString string    `json:"query"`
 }
 
 type SearchMatchAll struct {

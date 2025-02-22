@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var DefaultForbiddenCharacters = `[<>'";&|$*\[\]{}\\/%=]`
+var DefaultForbiddenCharacters = `[<>'";&|$\[\]{}\/%=]`
 
 func CleanSpace(input string) string {
 	return strings.TrimSpace(input)
