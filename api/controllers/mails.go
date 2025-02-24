@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"net/http"
+	"time"
 
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/middlewares"
@@ -28,7 +29,9 @@ func NewMailController(emailService services.IMailService) *MailController {
 func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
 	errCh := make(chan *apierrors.ResponseError)
 	resCh := make(chan *models.EmailSummaryResponse)
-	ctx := r.Context()
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(20)*time.Second)
+	defer cancel()
 
 	go func() {
 		query := r.URL.Query().Get("query")
@@ -44,7 +47,6 @@ func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// time.Sleep(time.Duration(5) * time.Second)
 		hits, err := mc.emailService.GetMailsHitsAndTotal(query, page, size)
 		if err != nil {
 			errCh <- err
@@ -60,7 +62,8 @@ func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
 func (mc MailController) GetMail(w http.ResponseWriter, r *http.Request) {
 	errCh := make(chan *apierrors.ResponseError)
 	resCh := make(chan *models.Email)
-	ctx := r.Context()
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(20)*time.Second)
+	defer cancel()
 	go func() {
 		id := chi.URLParam(r, "id")
 		hits, err := mc.emailService.GetMailByID(id)
@@ -81,6 +84,10 @@ func response[T any](responseCh chan T, errCh chan *apierrors.ResponseError, ctx
 	case err := <-errCh:
 		apierrors.RenderJSON(w, err)
 	case <-ctx.Done():
-		apierrors.RenderJSON(w, apierrors.ErrResponseRequestCancelled)
+		if ctx.Err() == context.Canceled {
+			apierrors.RenderJSON(w, apierrors.ErrResponseRequestCancelled)
+		} else if ctx.Err() == context.DeadlineExceeded {
+			apierrors.RenderJSON(w, apierrors.ErrResponseRequestTimeOut)
+		}
 	}
 }
