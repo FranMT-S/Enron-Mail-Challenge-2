@@ -80,3 +80,18 @@ a,
   background: var(--purple-deg-2);
 }
 
+
+.loading-text:before{
+  content: "";
+  animation-name: loadingText;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: 2000ms;
+}
+
+@keyframes loadingText {
+  0% {content: "";}
+  33% {content: "." }
+  66% {content: "..";}
+  100% {content: "...";}
+}
