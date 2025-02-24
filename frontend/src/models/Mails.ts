@@ -1,6 +1,7 @@
  export type Mail = {
 	message_id: string
 	date: Date
+	datetime: Date
 	from: string
 	to: string
 	bcc: string
