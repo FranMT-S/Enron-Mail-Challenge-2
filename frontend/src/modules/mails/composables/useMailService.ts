@@ -1,7 +1,7 @@
 import type { Mail } from "@/models/Mails";
 import { ref } from "vue";
 import { fetchGetMailByID, fetchGetMails } from "../services/mailservice";
-import type { IResponseError, ResponseMailSummary } from "@/models/Response";
+import { ResponseError, type IResponseError, type ResponseMailSummary } from "@/models/Response";
 
 
 export const useMailService = () => {
@@ -20,9 +20,11 @@ export const useMailService = () => {
     const {response,controller:co} =  fetchGetMails(query,page,size);
     controller.value = co;
     const res  = await response
+
     if(!res.ok){
-      const error: IResponseError = await res.json()
-      throw error
+      const _err: IResponseError = await res.json()
+      const err = new ResponseError(_err.status,_err.code,_err.message)
+      throw err
     }
 
     const mails:ResponseMailSummary = await res.json()
@@ -43,11 +45,16 @@ export const useMailService = () => {
 
     const {response,controller:co} =  fetchGetMailByID(id);
     controller.value = co;
+
+
     const res  = await response
 
+
     if(!res.ok){
-      const error: IResponseError = await res.json()
-      throw error
+      const _err: IResponseError = await res.json()
+      const err = new ResponseError(_err.status,_err.code,_err.message)
+
+      throw err
     }
 
     const mail:Mail = await res.json()
