@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { defineEmits } from 'vue';
-import ChangeDesign from './icons/ChangeDesignIcon.vue';
+import { useConfigStore } from '../store/useConfig';
+import { storeToRefs } from 'pinia';
 
-const emit = defineEmits(['get-emails','get-emails-by-id']);
+import { TypeVisualization } from '@/enums/TypeVisualization';
+import CalendarIcon from '../../components/icons/CalendarIcon.vue';
+import TableIcon from '@/modules/components/icons/TableIcon.vue';
+import VerticalWindows from '@/modules/components/icons/VerticalWindows.vue';
+import IconButton from './IconButton.vue';
+
+const {isTableViewMode} = storeToRefs(useConfigStore())
+
 
 </script>
 
@@ -11,9 +18,24 @@ const emit = defineEmits(['get-emails','get-emails-by-id']);
     <div class="flex items-center">
         <div class="flex items-center">
             <div class="flex items-center space-x-2">
-                <button title="Mark As Read" class="text-gray-700 p-[3px] border border-gray-300 rounded-lg shadow hover:bg-gray-200 ">
-                  <ChangeDesign/>
-                </button>
+                <IconButton
+                  :is-active="isTableViewMode == TypeVisualization.Calendar"
+                  @on-click="() => isTableViewMode = TypeVisualization.Calendar"
+                 >
+                  <CalendarIcon />
+                </IconButton>
+                <IconButton
+                  :is-active="isTableViewMode == TypeVisualization.Table"
+                  @on-click="() => isTableViewMode = TypeVisualization.Table"
+                 >
+                  <TableIcon />
+                </IconButton>
+                <IconButton
+                  :is-active="isTableViewMode == TypeVisualization.Vertical"
+                  @on-click="() => isTableViewMode = TypeVisualization.Vertical"
+                 >
+                  <VerticalWindows />
+                </IconButton>
             </div>
         </div>
     </div>

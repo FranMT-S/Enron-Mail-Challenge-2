@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import { formatDate } from '@/helpers/formatDate';
-import type { Mail, MailSummary } from '@/models/Mails';
+import type { MailSummary } from '@/models/Mails';
+import CalendarIconTwo from '@/modules/components/icons/CalendarIconTwo.vue';
+import PageIcon from '@/modules/components/icons/PageIcon.vue';
+import UserIcon from '@/modules/components/icons/UserIcon.vue';
+import UsersIcon from '@/modules/components/icons/UsersIcon.vue';
 import router from '@/routes';
 import { NamesRouter } from '@/routes/routesNames';
-import { computed, toRef } from 'vue';
+import { computed } from 'vue';
+import MailsTableColumn from './MailsTableColumn.vue';
+import MailsTableRow from './MailsTableRow.vue';
+import MailsError from './errors/MailsError.vue';
+import MailLoader from './MailLoader.vue';
 
 interface MailTableProps{
-  mails:MailSummary[]
+  mails:MailSummary[],
+  error?:Error,
+  isLoading?:boolean
 }
 
-const columns = ["From","To","Subject","Date"]
 
 const props = defineProps<MailTableProps>();
+
 
 const navigateToDetails = (id:string) =>{
   router.push({
@@ -20,7 +30,8 @@ const navigateToDetails = (id:string) =>{
   })
 }
 
-const newMails = computed(() => {
+
+const mailList = computed(() => {
   return props.mails.map(mail => {
     return {
       ...mail,
@@ -31,51 +42,64 @@ const newMails = computed(() => {
 
 </script>
 
-<style scoped>
-
-</style>
-
-
 <template>
-<div class="overflow-x-auto h-full mb-5 pr-[5px] rounded-t-[10px]">
-        <table class="min-w-max w-full table-auto ">
-            <thead class="sticky top-0 bg-[#6a2485] text-[#f3b2b2]">
+<div class="overflow-x-auto h-full mb-5 px-[5px] rounded-t-[10px]">
+        <table class="min-w-max w-full table-auto " :class="{'h-full':mailList.length == 0 || error || isLoading}">
+            <thead class="sticky top-0 bg-deg-purple-2 text-[#fff]">
                 <tr class=" uppercase text-sm leading-normal">
-                    <th class="py-3 px-6 text-center w-[200px]" v-for="column in columns" :key="column">
-                        {{ column }}
-                    </th>
+                    <MailsTableColumn>
+                      <UserIcon style="height: 16px;"/><p>From</p>
+                    </MailsTableColumn>
+                    <MailsTableColumn>
+                      <UsersIcon style="height: 20px;"/><p>To</p>
+                    </MailsTableColumn>
+                    <MailsTableColumn>
+                      <PageIcon style="height: 16px;"/><p>Subject</p>
+                    </MailsTableColumn>
+                    <MailsTableColumn>
+                      <CalendarIconTwo style="height: 16px;"/><p>Date</p>
+                    </MailsTableColumn>
                 </tr>
             </thead>
-            <tbody class="text-gray-600 text-sm font-light text-center">
-
-              <tr @click="() => navigateToDetails(mail.id)" class="border-b border-gray-200 hover:bg-gray-100" v-for="mail in newMails" :key="mail.id" >
-                    <td class="max-w-[100px]  py-3 px-6  text-center text-nowrap text-ellipsis overflow-hidden">
-                        <div class="text-ellipsis overflow-hidden text-nowrap">
-                            <span class="font-medium">{{ mail.from }}</span>
-                        </div>
-                    </td>
-                    <td class="max-w-[100px]  py-3 px-6 text-center  text-nowrap text-ellipsis overflow-hidden">
-                        <div class="text-ellipsis overflow-hidden text-nowrap ">
-                            <span>{{ mail.to }}</span>
-                        </div>
-                    </td>
-                    <td class="max-w-[100px]  py-3 px-6 text-center  text-nowrap text-ellipsis overflow-hidden">
-                        <div class="text-ellipsis overflow-hidden text-nowrap ">
-                          {{ mail.subject }}
-                        </div>
-                    </td>
-                    <td class="max-w-[100px]  py-3 px-6 text-center text-nowrap text-ellipsis overflow-hidden">
-                        <span class="py-1 px-3 rounded-full text-xs">
-                          {{ mail.date }}
-                        </span>
-                    </td>
+            <tbody class="text-gray-600  text-sm font-light text-left">
+              <template v-if="isLoading">
+                <tr>
+                  <td colspan="4">
+                      <MailLoader showText/>
+                  </td>
                 </tr>
-            </tbody>
+              </template>
+              <template v-else-if="mailList.length > 0 && !error">
+                <tr @click="() => navigateToDetails(mail.id)" class=" h-[34px] border-b border-gray-200 shadow-purple cursor-pointer  hover:text-[#fff] bg-deg-purple-2_hover" v-for="mail in mailList" :key="mail.id" >
+                    <MailsTableRow>
+                      <span class="font-medium">{{ mail.from }}</span>
+                    </MailsTableRow>
+                    <MailsTableRow>
+                      <span>{{ mail.to }}</span>
+                    </MailsTableRow>
+                    <MailsTableRow>
+                      <span>{{ mail.subject }}</span>
+                    </MailsTableRow>
+                    <MailsTableRow>
+                      <span> {{ mail.date }}</span>
+                    </MailsTableRow>
+                  </tr>
+              </template>
+              <template v-else>
+                <tr>
+                  <td colspan="4">
+                    <MailsError :error="error" :onlyTitle="false"/>
+                  </td>
+                </tr>
+              </template>
+          </tbody>
         </table>
     </div>
 </template>
 
 <style>
-
+.shadow-purple:hover {
+    box-shadow: 0px 0px 7px 0px #200576;
+}
 
 </style>

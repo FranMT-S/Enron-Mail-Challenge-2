@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import FilterIcon from './icons/FilterIcon.vue';
-import SearchIcon from './icons/SearchIcon.vue';
+import FilterIcon from '../../components/icons/FilterIcon.vue';
+import SearchIcon from '../../components/icons/SearchIcon.vue';
 import SearchBarFilterModal, { type IFilterFormData } from './SearchBarFilterModal.vue';
 
 interface IEvents {
   (e: 'on-search',query:string): void
 }
 
+interface Props{
+  initialQuery?:string
+}
+
 const isFilterActive = ref(false)
-const query = ref("")
+
+const {initialQuery} = defineProps<Props>()
+const query = ref(initialQuery ?? "")
 const emit = defineEmits<IEvents>()
 
 const EmitSearch = () =>{

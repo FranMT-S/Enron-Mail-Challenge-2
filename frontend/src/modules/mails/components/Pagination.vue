@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, toRef, toRefs, watch } from 'vue';
 import { usePagination } from '../composables/usePagination';
-import LeftArrowIcon from './icons/LeftArrowIcon.vue';
+import LeftArrowIcon from '../../components/icons/LeftArrowIcon.vue';
 
 interface Props {
   page: number;
