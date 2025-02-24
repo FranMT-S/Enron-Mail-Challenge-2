@@ -3,6 +3,7 @@ package models
 type Email struct {
 	MessageID               string `json:"message_id"`
 	Date                    string `json:"date"`
+	DateTime                string `json:"datetime"`
 	From                    string `json:"from"`
 	To                      string `json:"to"`
 	Bcc                     string `json:"bcc"`

@@ -13,6 +13,15 @@ func GetIndexString(indexName string) string {
 			Properties: Properties{
 				Date: Property{
 					Type:          "date",
+					Format:        time.DateOnly,
+					Index:         true,
+					Store:         true,
+					Sortable:      true,
+					Aggregratable: true,
+					Highlightable: true,
+				},
+				DateTime: Property{
+					Type:          "date",
 					Format:        time.RFC3339,
 					Index:         true,
 					Store:         true,

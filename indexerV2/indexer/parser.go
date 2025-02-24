@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/models"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/shared"
@@ -90,12 +91,15 @@ func processChunk(chunk string, mail *models.Email, lastFieldUpdated *string, is
 		case "message-id":
 			mail.MessageID += value
 		case "date":
-			date, err := shared.ParseDate(value)
+			datetime, err := shared.ParseDate(value)
 			if err != nil {
 				fmt.Println("Date Error")
 				return err
 			}
-			mail.Date = date
+			dateWithoutOffset := datetime.UTC()
+
+			mail.Date = dateWithoutOffset.Format(time.DateOnly)
+			mail.DateTime = datetime.Format(time.RFC3339)
 		case "from":
 			mail.From += value
 		case "to":

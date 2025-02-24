@@ -12,19 +12,20 @@ const (
 	Bool    TypeProperty = "bool"
 )
 
-type Property struct {
-	Type          TypeProperty `json:"type"`
-	Format        string       `json:"format,omitempty"`
-	Index         bool         `json:"index"`
-	Store         bool         `json:"store"`
-	Sortable      bool         `json:"sortable"`
-	Aggregratable bool         `json:"aggregatable"`
-	Highlightable bool         `json:"highlightable"`
+type ZincSearchIndex struct {
+	Name        string   `json:"name"`
+	StorageType string   `json:"storage_type"`
+	Mappings    Mappings `json:"mappings"`
+}
+
+type Mappings struct {
+	Properties Properties `json:"properties"`
 }
 
 type Properties struct {
 	MessageID               Property `json:"message_id"`
 	Date                    Property `json:"date"`
+	DateTime                Property `json:"datetime"`
 	From                    Property `json:"from"`
 	To                      Property `json:"to"`
 	Bcc                     Property `json:"bcc"`
@@ -43,14 +44,14 @@ type Properties struct {
 	Body                    Property `json:"body"`
 }
 
-type Mappings struct {
-	Properties Properties `json:"properties"`
-}
-
-type ZincSearchIndex struct {
-	Name        string   `json:"name"`
-	StorageType string   `json:"storage_type"`
-	Mappings    Mappings `json:"mappings"`
+type Property struct {
+	Type          TypeProperty `json:"type"`
+	Format        string       `json:"format,omitempty"`
+	Index         bool         `json:"index"`
+	Store         bool         `json:"store"`
+	Sortable      bool         `json:"sortable"`
+	Aggregratable bool         `json:"aggregatable"`
+	Highlightable bool         `json:"highlightable"`
 }
 
 type IPostMail interface {
