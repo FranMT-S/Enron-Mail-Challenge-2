@@ -44,7 +44,7 @@ func IsZincError(zincErr ZincSearchError) *ResponseError {
 
 func IsZincErrorWithType(zincErr ZincSearchErrorWithType) *ResponseError {
 	if zincErr.MessageError.Type == ErrZincTypeError {
-		return ErrResponseFaildParsedError
+		return ErrResponseFaildParsedError.WithLogError(errors.New(zincErr.MessageError.Cause))
 	}
 
 	return nil

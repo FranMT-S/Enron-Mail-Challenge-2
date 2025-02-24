@@ -6,7 +6,6 @@ import (
 
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/db"
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/helpers"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/middlewares"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 	"github.com/go-chi/render"
@@ -16,7 +15,6 @@ func TestQueryBuilderfunc(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("query")
 	fmt.Println("Query:", query)
 	page, err := middlewares.Paginator.GetPageFromContext(r)
-	timeZone := helpers.GetTimeZone(r)
 
 	if err != nil {
 		apierrors.RenderJSON(w, err)
@@ -28,8 +26,8 @@ func TestQueryBuilderfunc(w http.ResponseWriter, r *http.Request) {
 		apierrors.RenderJSON(w, err)
 		return
 	}
-	fields := []string{models.FromField, models.ToField, models.DateField, models.SubjectField}
-	Query, errRes := db.QueryBuilder(query, page, size, fields, timeZone)
+	fields := []string{models.FromField, models.ToField, models.DateTimeField, models.DateField, models.SubjectField}
+	Query, errRes := db.QueryBuilder(query, page, size, fields)
 	if errRes != nil {
 		apierrors.RenderJSON(w, errRes)
 		return

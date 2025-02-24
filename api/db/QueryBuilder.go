@@ -7,10 +7,11 @@ import (
 	"time"
 
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/helpers"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 )
 
-func QueryBuilder(queryString string, page, size int, fields []string, timeZone string) (*models.Query, *apierrors.ResponseError) {
+func QueryBuilder(queryString string, page, size int, fields []string) (*models.Query, *apierrors.ResponseError) {
 	QueryModel := models.NewQuery()
 	from := (page - 1) * size
 	QueryModel.SetFields(fields).SetSize(size).SetFrom(from)
@@ -25,14 +26,15 @@ func QueryBuilder(queryString string, page, size int, fields []string, timeZone 
 	fieldRegex := fmt.Sprintf(`%v:(%v|\S+)`, NameFieldWithSpecialCharacters, valueInnerParentheses)
 
 	searchFieldsExpresionRegex := regexp.MustCompile(fieldRegex)
-
+	fmt.Println("\\")
 	matchFieldsExpresionList := searchFieldsExpresionRegex.FindAllString(queryString, -1)
 
-	if errRes := processAndAddFilteringQueries(QueryModel, matchFieldsExpresionList, timeZone); errRes != nil {
+	if errRes := processAndAddFilteringQueries(QueryModel, matchFieldsExpresionList); errRes != nil {
 		return nil, errRes
 	}
 
 	query := searchFieldsExpresionRegex.ReplaceAllString(queryString, "")
+
 	query = CleanCharacters(query)
 
 	QueryModel.AddQueryString(query)
@@ -44,14 +46,13 @@ func CleanCharacters(s string) string {
 	// s = strings.ReplaceAll(s, ":", "")
 	s = strings.ReplaceAll(s, "(", "")
 	s = strings.ReplaceAll(s, ")", "")
-	s = strings.ReplaceAll(s, "-", "")
 	s = strings.ReplaceAll(s, "*", "")
 	return s
 }
 
-func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string, timeZone string) *apierrors.ResponseError {
-	rangeFilter := models.DateRange{}
-	layout := "2006-01-02"
+func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string) *apierrors.ResponseError {
+
+	layouts := []string{"2006-01-02", "2006/01/02"}
 
 	for _, field := range fieldsExpresion {
 		isExclusionFilter := false
@@ -68,38 +69,41 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 
 		isExclusionFilter = optionsFlag == "-"
 		isOperatorOR = optionsFlag == "*"
-		fmt.Println(optionsFlag)
-		fmt.Println("key:", key)
-		fmt.Println("key:", optionsFlag == "*")
+		key = CleanCharacters(key)
 
 		if isOperatorOR {
 			operator = models.OR
 		}
 
-		key = CleanCharacters(key)
-
 		switch key {
-		case "before":
-			date, err := dateParsed(layout, value, timeZone)
-			if err != nil {
-				return err
-			}
-			rangeFilter.Range.Date.GreatherThanOrEquals = &date
-		case "after":
-			date, err := dateParsed(layout, value, timeZone)
+		case "since", "until", "before", "after", "date":
+			date, err := helpers.DateParsed(value, "UTC", layouts)
 			if err != nil {
 				return err
 			}
 
-			rangeFilter.Range.Date.LessThanOrEquals = &date
+			rangeFilter := models.DateRange{}
+
+			switch key {
+			case "since":
+				rangeFilter.Range.Date.GreatherThanOrEquals = &date
+			case "until":
+				rangeFilter.Range.Date.LessThanOrEquals = &date
+			case "after":
+				rangeFilter.Range.Date.GreatherThan = &date
+			case "before":
+				rangeFilter.Range.Date.LessThan = &date
+			case "date":
+				rangeFilter.Range.Date.GreatherThanOrEquals = &date
+				rangeFilter.Range.Date.LessThanOrEquals = &date
+			}
+
+			rangeFilter.Range.Date.Format = time.RFC3339
+			Query.AddRangeFilter(rangeFilter)
+
 		default:
 			Query.AddMatchFieldFilter(key, value, operator, isExclusionFilter)
 		}
-	}
-
-	if !isEmptyDateRange(rangeFilter) {
-		rangeFilter.Range.Date.Format = time.RFC3339
-		Query.AddRangeFilter(rangeFilter)
 	}
 
 	return nil
@@ -107,22 +111,4 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 
 func isEmptyDateRange(dr models.DateRange) bool {
 	return dr == models.DateRange{}
-}
-
-func dateParsed(layout, value, timeZone string) (time.Time, *apierrors.ResponseError) {
-	var loc *time.Location
-	loc, err := time.LoadLocation(timeZone)
-	if err != nil {
-		loc = time.UTC
-	}
-
-	date, err := time.ParseInLocation(layout, value, loc)
-	if err != nil {
-		resErr := apierrors.ErrResponseDateFormatNotValid.WithLogError(err)
-		resErr.Message = resErr.Message + ".Value:" + value
-		return time.Time{}, resErr
-	}
-
-	return date, nil
-
 }

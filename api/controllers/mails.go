@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/helpers"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/middlewares"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/services"
@@ -33,7 +32,6 @@ func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		query := r.URL.Query().Get("query")
-		timeZone := helpers.GetTimeZone(r)
 		page, err := middlewares.Paginator.GetPageFromContext(r)
 		if err != nil {
 			errCh <- err
@@ -47,7 +45,7 @@ func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// time.Sleep(time.Duration(5) * time.Second)
-		hits, err := mc.emailService.GetMailsHitsAndTotal(query, page, size, timeZone)
+		hits, err := mc.emailService.GetMailsHitsAndTotal(query, page, size)
 		if err != nil {
 			errCh <- err
 			return

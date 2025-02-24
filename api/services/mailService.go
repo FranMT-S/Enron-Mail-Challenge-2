@@ -28,7 +28,7 @@ import (
 // )
 
 type IMailService interface {
-	GetMailsHitsAndTotal(query string, page int, size int, timeZone string) (*models.EmailSummaryResponse, *apierrors.ResponseError)
+	GetMailsHitsAndTotal(query string, page int, size int) (*models.EmailSummaryResponse, *apierrors.ResponseError)
 	GetMailByID(id string) (*models.Email, *apierrors.ResponseError)
 }
 
@@ -42,9 +42,9 @@ func NewMailService(indexDb db.IndexDB) *MailService {
 	}
 }
 
-func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size int, timeZone string) (*models.EmailSummaryResponse, *apierrors.ResponseError) {
+func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size int) (*models.EmailSummaryResponse, *apierrors.ResponseError) {
 	fields := []string{models.FromField, models.ToField, models.DateField, models.SubjectField}
-	Query, err := db.QueryBuilder(queryString, page, size, fields, timeZone)
+	Query, err := db.QueryBuilder(queryString, page, size, fields)
 	if err != nil {
 		return nil, err
 	}

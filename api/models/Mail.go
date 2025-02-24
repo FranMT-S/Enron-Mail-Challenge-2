@@ -3,6 +3,7 @@ package models
 const (
 	MessageIDField               string = "message_id"
 	DateField                    string = "date"
+	DateTimeField                string = "datetime"
 	FromField                    string = "from"
 	ToField                      string = "to"
 	BccField                     string = "bcc"
@@ -24,6 +25,7 @@ const (
 type Email struct {
 	MessageID               string `json:"message_id"`
 	Date                    string `json:"date"`
+	Datetime                string `json:"datetime"`
 	From                    string `json:"from"`
 	To                      string `json:"to"`
 	Bcc                     string `json:"bcc"`

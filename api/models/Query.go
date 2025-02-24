@@ -176,8 +176,11 @@ type DateRange struct {
 // }
 
 type DateInterval struct {
+	GreatherThan         *time.Time `json:"gt,omitempty"`
+	LessThan             *time.Time `json:"lt,omitempty"`
 	GreatherThanOrEquals *time.Time `json:"gte,omitempty"`
 	LessThanOrEquals     *time.Time `json:"lte,omitempty"`
+	TimeZone             string     `json:"time_zone,omitempty"`
 	Format               string     `json:"format,omitempty"`
 }
 
