@@ -30,7 +30,7 @@ func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
 	errCh := make(chan *apierrors.ResponseError)
 	resCh := make(chan *models.EmailSummaryResponse)
 
-	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(20)*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
 	defer cancel()
 
 	go func() {
@@ -62,7 +62,7 @@ func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
 func (mc MailController) GetMail(w http.ResponseWriter, r *http.Request) {
 	errCh := make(chan *apierrors.ResponseError)
 	resCh := make(chan *models.Email)
-	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(20)*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
 	defer cancel()
 	go func() {
 		id := chi.URLParam(r, "id")
