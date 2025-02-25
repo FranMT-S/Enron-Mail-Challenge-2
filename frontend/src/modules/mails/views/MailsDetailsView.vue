@@ -34,8 +34,6 @@ const InitializeData = async (id:string) =>{
     relatedMails.value =  _mails
     mailsMap.set(_mail.id,_mail)
   } catch (err) {
-    console.log("error");
-    console.log(err);
     if(!isAbortError(err))
       isLoading.value = false
     error.value = ValidateError(err)
@@ -67,7 +65,6 @@ const setMail = async (payload:MailSummary) =>{
 const getRelatedMails = async(mail:Mail) =>{
   try {
     let subject = mail.subject.replace(/Re:|FW:/i,"").trim();
-    console.log(subject);
     let origin = mail.x_origin;
     let to = mail.to;
     let from = mail.from;

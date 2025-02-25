@@ -48,7 +48,6 @@ const handleClickOutside = (event: MouseEvent) => {
 };
 
 const sendData = () =>{
-  console.log({...formData.value});
   emit('on-submit',formData.value)
   close();
 }
