@@ -5,7 +5,7 @@
 
 <style>
   .ico-wifi-error.icon-primary-color{
-    color:#006bec
+    color:#3d0183
   }
 
   .ico-wifi-error .ico-secondary-color{

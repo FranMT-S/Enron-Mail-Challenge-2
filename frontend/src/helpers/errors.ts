@@ -1,6 +1,6 @@
 import { ResponseError } from "@/models/Response"
 
-export const isAbortError = (err:Error) =>{
+export const isAbortError = (err:unknown) =>{
   return err instanceof DOMException && err.name === "AbortError"
 }
 

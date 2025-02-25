@@ -1,4 +1,4 @@
-export const NamesRouter = {
-  Index:"index",
-  MailDetail:"mail-details"
+export enum NamesRouter {
+  Index = "index",
+  MailDetail = "mail-details"
 }

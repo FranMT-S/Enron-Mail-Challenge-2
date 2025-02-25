@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ValidateError } from '@/helpers/errors';
+import { isAbortError, ValidateError } from '@/helpers/errors';
 import type { MailSummary } from '@/models/Mails';
 import { type ResponseMailSummary } from '@/models/Response';
 import { storeToRefs } from 'pinia';
@@ -21,7 +21,7 @@ itemPerPage.value = itemPerPageList[0]
 const isLoading = ref(false)
 const error = ref<Error | undefined>()
 const total = ref(1)
-const {getMails} = useMailService()
+const {getMails,controller} = useMailService()
 const {debounce} = useDebounce(200)
 
 const handlerGetMails = async (query:string = "", page:number = 1, size:number=  30) => {
@@ -31,10 +31,11 @@ const handlerGetMails = async (query:string = "", page:number = 1, size:number= 
     const mails:ResponseMailSummary = await getMails(query,page,size)
     total.value = mails.total
     emailsSummary.value = mails.emails
-  } catch (err) {
-    error.value = ValidateError(err)
-  }finally{
     isLoading.value = false
+  } catch (err) {
+    if(!isAbortError(err))
+      isLoading.value = false
+    error.value = ValidateError(err)
   }
 };
 
@@ -45,7 +46,9 @@ watch([queryString,page,itemPerPage],([newQuery,newPage,newTotalPerPage]) => {
     page.value  = newPage
   }
   debounce(() =>{
+
     handlerGetMails(newQuery,newPage,newTotalPerPage)
+
   })
 })
 
@@ -55,6 +58,7 @@ const onChangeQuery = (newQuery:string) => queryString.value = newQuery
 
 
 onMounted(async () => await handlerGetMails(queryString.value,1,itemPerPage.value))
+
 
 </script>
 

@@ -19,12 +19,6 @@ const {isTableViewMode} = storeToRefs(useConfigStore())
         <div class="flex items-center">
             <div class="flex items-center space-x-2">
                 <IconButton
-                  :is-active="isTableViewMode == TypeVisualization.Calendar"
-                  @on-click="() => isTableViewMode = TypeVisualization.Calendar"
-                 >
-                  <CalendarIcon />
-                </IconButton>
-                <IconButton
                   :is-active="isTableViewMode == TypeVisualization.Table"
                   @on-click="() => isTableViewMode = TypeVisualization.Table"
                  >
@@ -35,6 +29,12 @@ const {isTableViewMode} = storeToRefs(useConfigStore())
                   @on-click="() => isTableViewMode = TypeVisualization.Vertical"
                  >
                   <VerticalWindows />
+                </IconButton>
+                <IconButton
+                  :is-active="isTableViewMode == TypeVisualization.Calendar"
+                  @on-click="() => isTableViewMode = TypeVisualization.Calendar"
+                 >
+                  <CalendarIcon />
                 </IconButton>
             </div>
         </div>

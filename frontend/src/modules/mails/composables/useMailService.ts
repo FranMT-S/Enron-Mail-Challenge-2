@@ -45,10 +45,7 @@ export const useMailService = () => {
 
     const {response,controller:co} =  fetchGetMailByID(id);
     controller.value = co;
-
-
     const res  = await response
-
 
     if(!res.ok){
       const _err: IResponseError = await res.json()
