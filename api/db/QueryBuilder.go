@@ -36,6 +36,8 @@ func QueryBuilder(queryString string, page, size int, fields []string) (*models.
 	query := searchFieldsExpresionRegex.ReplaceAllString(queryString, "")
 
 	query = CleanCharacters(query)
+	// replace possible the pattern field without value field:
+	query = strings.ReplaceAll(query, ":", "")
 
 	QueryModel.AddQueryString(query)
 	return QueryModel, nil
