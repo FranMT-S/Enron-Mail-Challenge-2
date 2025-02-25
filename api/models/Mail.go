@@ -23,6 +23,7 @@ const (
 )
 
 type Email struct {
+	ID                      string `json:"id"`
 	MessageID               string `json:"message_id"`
 	Date                    string `json:"date"`
 	Datetime                string `json:"datetime"`
@@ -50,4 +51,6 @@ type EmailSummary struct {
 	From    string `json:"from"`
 	To      string `json:"to"`
 	Subject string `json:"subject"`
+	XFrom   string `json:"x_from"`
+	XTo     string `json:"x_to"`
 }

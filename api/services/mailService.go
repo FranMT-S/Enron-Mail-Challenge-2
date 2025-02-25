@@ -6,27 +6,6 @@ import (
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 )
 
-// const (
-// 	_message_id                = "message_id"
-// 	_date                      = "date"
-// 	_from                      = "from"
-// 	_to                        = "to"
-// 	_bcc                       = "bcc"
-// 	_cc                        = "cc"
-// 	_subject                   = "subject"
-// 	_mime_version              = "mime_version"
-// 	_content_type              = "content_type"
-// 	_content_transfer_encoding = "content_transfer_encoding"
-// 	_x_from                    = "x_from"
-// 	_x_to                      = "x_to"
-// 	_x_cc                      = "x_cc"
-// 	_x_bcc                     = "x_bcc"
-// 	_x_folder                  = "x_folder"
-// 	_x_origin                  = "x_origin"
-// 	_x_file_name               = "x_file_name"
-// 	_body                      = "body"
-// )
-
 type IMailService interface {
 	GetMailsHitsAndTotal(query string, page int, size int) (*models.EmailSummaryResponse, *apierrors.ResponseError)
 	GetMailByID(id string) (*models.Email, *apierrors.ResponseError)
@@ -43,7 +22,11 @@ func NewMailService(indexDb db.IndexDB) *MailService {
 }
 
 func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size int) (*models.EmailSummaryResponse, *apierrors.ResponseError) {
-	fields := []string{models.FromField, models.ToField, models.DateField, models.SubjectField}
+	fields := []string{
+		models.FromField, models.ToField, models.DateField,
+		models.SubjectField, models.XToField, models.XFromField,
+	}
+
 	Query, err := db.QueryBuilder(queryString, page, size, fields)
 	if err != nil {
 		return nil, err
@@ -63,6 +46,8 @@ func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size in
 		email.From = hit.Source.From
 		email.To = hit.Source.To
 		email.Date = hit.Source.Date
+		email.XFrom = hit.Source.XFrom
+		email.XTo = hit.Source.XTo
 		email.Subject = hit.Source.Subject
 		emails = append(emails, email)
 	}
@@ -82,6 +67,7 @@ func (ms MailService) GetMailByID(id string) (*models.Email, *apierrors.Response
 	}
 
 	email := hit.Source
+	email.ID = hit.ID
 
 	return &email, nil
 }
