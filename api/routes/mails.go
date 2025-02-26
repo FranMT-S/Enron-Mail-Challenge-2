@@ -10,7 +10,7 @@ func MailsRouter(mailController controllers.IMailController) chi.Router {
 	r := chi.NewRouter()
 
 	r.Group(func(r chi.Router) {
-		r.Use(middlewares.Paginator)
+		r.Use(middlewares.Paginator(1000))
 		r.Get("/", mailController.GetMails)
 		r.Get("/{id}", mailController.GetMail)
 	})

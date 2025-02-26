@@ -60,7 +60,7 @@ func (server *Server) setupRoutes() {
 
 	if config.IS_DEVELOPMENT {
 		api.Route("/test", func(r chi.Router) {
-			r.Use(middlewares.Paginator)
+			r.Use(middlewares.Paginator(1000))
 			r.Get("/query", controllers.TestQueryBuilderfunc)
 		})
 	}

@@ -9,37 +9,43 @@ import (
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
 )
 
-type paginatorFunc func(next http.Handler) http.Handler
+type paginatorFunc func(maxSize int) func(next http.Handler) http.Handler
 
 // add page and size to http context
-var Paginator paginatorFunc = func(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		pageParam := query.Get(constants.PAGE)
-		if pageParam == "" {
-			pageParam = r.Form.Get(constants.PAGE)
-		}
+var Paginator paginatorFunc = func(maxSize int) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			query := r.URL.Query()
+			pageParam := query.Get(constants.PAGE)
+			if pageParam == "" {
+				pageParam = r.Form.Get(constants.PAGE)
+			}
 
-		page, err := strconv.Atoi(pageParam)
-		if err != nil || page < 1 {
-			page = 1 // Página por defecto
-		}
+			page, err := strconv.Atoi(pageParam)
+			if err != nil || page < 1 {
+				page = 1 // Página por defecto
+			}
 
-		sizeParam := query.Get(constants.SIZE)
-		if sizeParam == "" {
-			sizeParam = r.Form.Get(constants.SIZE)
-		}
+			sizeParam := query.Get(constants.SIZE)
+			if sizeParam == "" {
+				sizeParam = r.Form.Get(constants.SIZE)
+			}
 
-		size, err := strconv.Atoi(sizeParam)
-		if err != nil || size < 1 || size > 200 {
-			size = 100
-		}
+			size, err := strconv.Atoi(sizeParam)
+			if err != nil || size < 1 {
+				size = 100
+			}
 
-		ctx := context.WithValue(r.Context(), constants.PAGE, page)
-		ctx = context.WithValue(ctx, constants.SIZE, size)
+			if size > maxSize {
+				size = maxSize
+			}
 
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+			ctx := context.WithValue(r.Context(), constants.PAGE, page)
+			ctx = context.WithValue(ctx, constants.SIZE, size)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }
 
 func (p paginatorFunc) GetPageFromContext(r *http.Request) (int, *apierrors.ResponseError) {
