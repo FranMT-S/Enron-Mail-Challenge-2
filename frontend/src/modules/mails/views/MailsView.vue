@@ -41,21 +41,17 @@ const handlerGetMails = async (query:string = "", page:number = 1, size:number= 
 
 
 watch([queryString,page,itemPerPage],([newQuery,newPage,newTotalPerPage]) => {
-  if(queryString.value != newQuery){
-    newPage  = 1
-    page.value  = newPage
-  }
-  debounce(() =>{
-
-    handlerGetMails(newQuery,newPage,newTotalPerPage)
-
+  debounce(async () =>{
+    await handlerGetMails(newQuery,newPage,newTotalPerPage)
   })
 })
 
 const onChangePage = (newPage:number) => page.value = newPage
 const onChangeItemPerPage = (newValue:number) => itemPerPage.value = newValue
-const onChangeQuery = (newQuery:string) => queryString.value = newQuery
-
+const onChangeQuery = (newQuery:string) => {
+  queryString.value = newQuery;
+  page.value = 1;
+}
 
 onMounted(async () => await handlerGetMails(queryString.value,1,itemPerPage.value))
 

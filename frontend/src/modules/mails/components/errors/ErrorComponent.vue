@@ -56,7 +56,7 @@ onMounted(() => validateError(props.error))
   <div class="w-full flex flex-col justify-center items-center ">
       <div
         :class="{'max-w-[300px]':code == 404}"
-        class="flex flex-col max-w-[200px]">
+        class="flex flex-col max-w-[150px]">
         <Image class="ico w-full text-[#4f108e]" :class="[':text-[#c338c3]']"/>
       </div>
       <h1 class=" text-[#5000a0] text-lg font-semibold text-center ">{{message}}</h1>

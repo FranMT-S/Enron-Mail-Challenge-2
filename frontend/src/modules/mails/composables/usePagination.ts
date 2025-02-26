@@ -1,4 +1,4 @@
-import { computed, ref, type Ref } from "vue"
+import { computed, ref, watch, type Ref } from "vue"
 
 export const usePagination = (
   InitialPage:Ref<number> = ref(1),
@@ -10,7 +10,7 @@ export const usePagination = (
     Total.value = 1
 
   const totalPages = computed(() => {
-    if(Total.value == 0)
+    if(Total.value <= 0)
       return 1
 
     return Math.ceil(Total.value / itemsPerPage.value)
@@ -22,17 +22,23 @@ export const usePagination = (
     InitialPage.value = 1
 
   const currentPage = ref(InitialPage.value)
+
   const currentFrom = computed(() => {
-    const page = currentPage.value - 1
-    return page == 0 ? 1 : page * itemsPerPage.value
+    const page = currentPage.value <= 0 ? 0 : currentPage.value - 1
+
+    return 1 + ( page * itemsPerPage.value)
   })
 
   const currentTo = computed(() => {
-    return currentPage.value == totalPages.value ? Total.value : currentPage.value * itemsPerPage.value
+    const page = currentPage.value <= 0 ? 1 : currentPage.value
+    if(currentPage.value == totalPages.value)
+      return Total.value
+
+    return  page  * itemsPerPage.value
   })
 
   const isFirstPage = computed(() => {
-    return currentPage.value == 1
+    return currentPage.value <= 1
   })
 
   const isLastPage = computed(() => {

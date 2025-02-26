@@ -21,7 +21,6 @@ const props = defineProps<Props>();
 const emit = defineEmits<IEvents>()
 const {page,itemPerPage,totalElement} = toRefs(props)
 
-
 const {
   currentPage,
   currentFrom,
@@ -56,10 +55,15 @@ const validatePage = (e:Event) =>{
     return
   }
 
+  currentPage.value = newValue
 }
 
 watch(currentPage,() => {
   emit('onChangePage',currentPage.value)
+})
+
+watch(page,(newValue) => {
+  currentPage.value = newValue
 })
 
 const onChangeItemsPerList = (e:Event) =>{
