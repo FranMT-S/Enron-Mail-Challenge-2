@@ -12,24 +12,12 @@ import MailsTableColumn from './MailsTableColumn.vue';
 import MailsTableRow from './MailsTableRow.vue';
 import MailsError from './errors/MailsError.vue';
 import MailLoader from './MailLoader.vue';
-
-interface MailTableProps{
-  mails:MailSummary[],
-  error?:Error,
-  isLoading?:boolean
-}
+import {  type MailsEmit, type MailsProps } from '@/models/mailProps';
 
 
-const props = defineProps<MailTableProps>();
+const props = defineProps<MailsProps>();
 
-
-const navigateToDetails = (id:string) =>{
-  router.push({
-    name:NamesRouter.MailDetail,
-    params:{id}
-  })
-}
-
+const emit = defineEmits<MailsEmit>();
 
 const mailList = computed(() => {
   return props.mails.map(mail => {
@@ -39,6 +27,12 @@ const mailList = computed(() => {
     }
   })
 });
+
+const onSelectMail = (index:number) =>{
+  const mail = props.mails[index];
+  if(mail)
+    emit('onselectmail',mail)
+}
 
 </script>
 
@@ -70,7 +64,9 @@ const mailList = computed(() => {
                 </tr>
               </template>
               <template v-else-if="mailList.length > 0 && !error">
-                <tr @click="() => navigateToDetails(mail.id)" class=" h-[34px] border-b border-gray-200 shadow-purple cursor-pointer  hover:text-[#fff] bg-deg-purple-2_hover" v-for="mail in mailList" :key="mail.id" >
+                <tr v-for="(mail,index) in mailList" :key="mail.id"  @click="() => onSelectMail(index)"
+                  class=" h-[34px] border-b border-gray-200 shadow-purple cursor-pointer  hover:text-[#fff] bg-deg-purple-2_hover"
+                >
                     <MailsTableRow>
                       <span class="font-medium">{{ mail.from }}</span>
                     </MailsTableRow>

@@ -15,9 +15,9 @@ import { useSearchStore } from '../store/useSearchStore';
 </script>
 
 <template>
-  <nav class="rounded-b-[5px] w-full flex py-[6px] px-[30px]  gap-[20px]  bg-deg-purple-1 text-white shadow-[1px_3px_20px_2px_#aa6af56e]">
+  <nav class="rounded-b-[5px] w-full  flex py-[6px] px-[30px]  gap-[20px]  bg-deg-purple-1 text-white shadow-[1px_3px_20px_2px_#aa6af56e]">
       <LogoApp class="scale-125 "/>
-      <SearchBar :initial-query="queryString"  @on-search="onSearch" class="w-[50%] mx-auto"/>
+      <SearchBar :initial-query="queryString"  @on-search="onSearch" class="!w-[80%] mx-auto"/>
   </nav>
 </template>
 

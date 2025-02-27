@@ -11,6 +11,7 @@ import MailLoader from '../components/MailLoader.vue';
 import BackArrow from '@/modules/components/icons/BackArrow.vue';
 import MailsError from '../components/errors/MailsError.vue';
 import MailDetails from '../components/MailDetails.vue';
+import { useMailsStore } from '../store/useMailsStore';
 
 
 const route = useRoute();
@@ -23,12 +24,13 @@ const isLoading = ref(true);
 const mailsMap = new Map<string,Mail>()
 const error = ref<Error | undefined>(undefined)
 
-const {getMailByID,getMails,abortPreviousRequest} = useMailService()
+const {getMails,abortPreviousRequest} = useMailService()
+const {getEmail} = useMailsStore()
 
 const InitializeData = async (id:string) =>{
+  let _mails:MailSummary[] = []
   try {
-    const _mail =  await getMailByID(id)
-    let _mails:MailSummary[] = []
+    const _mail =  await getEmail(id)
     _mails = await getRelatedMails(_mail)
     mail.value =  _mail
     relatedMails.value =  _mails
@@ -36,6 +38,7 @@ const InitializeData = async (id:string) =>{
   } catch (err) {
     if(!isAbortError(err))
       isLoading.value = false
+
     error.value = ValidateError(err)
   }
 }
@@ -47,8 +50,7 @@ const setMail = async (payload:MailSummary) =>{
       mail.value = mailsMap.get(payload.id)!
     }else{
       isLoading.value = true
-      const _mails = await getMailByID(payload.id)
-
+      const _mails = await getEmail(payload.id)
 
       mailsMap.set(_mails.id,_mails)
       mail.value = _mails
@@ -90,15 +92,15 @@ onUnmounted(() => abortPreviousRequest())
 </script>
 
 <template>
-<main class="grid grid-cols-[minmax(30vw,1fr)_minmax(50vw,100%)] w-full h-full shadow-lg rounded-3xl col-span-2 row-span-2 p-4  gap-[25px]" >
-      <MailsSideBar @OnMail="setMail"  :mails="relatedMails" :idMailSelected="mail?.id" title="Related emails">
+<main class="grid grid-cols-[minmax(min(30vw,250px),min-content)_minmax(50vw,100%)] w-full h-full shadow-lg rounded-3xl col-span-2 row-span-2 p-4  gap-[25px]" >
+      <MailsSideBar @onselectmail="setMail"  :mails="relatedMails" :idMailSelected="mail?.id" title="Related emails">
         <div class="flex sticky top-0 pt-[6px] bg-[#fff]">
             <BackArrow @click="() => goIndex()"  class="cursor-pointer h-[30px] text-[#7a03ea]  hover:opacity-90 opacity-70 "/>
         </div>
       </MailsSideBar>
       <section
         :class="{'justify-center w-full':isLoading || error, }"
-        class="w-full px-4 flex flex-col py-4   bg-white rounded-r-3xl h-full overflow-y-scroll "
+        class="w-full px-4 flex flex-col py-4   bg-white rounded-r-3xl h-full overflow-auto "
       >
         <MailLoader showText v-if="isLoading"/>
         <MailDetails v-else-if="mail != null" :mail="mail"/>

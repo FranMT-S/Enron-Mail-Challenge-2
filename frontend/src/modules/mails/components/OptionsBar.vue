@@ -8,34 +8,43 @@ import TableIcon from '@/modules/components/icons/TableIcon.vue';
 import VerticalWindows from '@/modules/components/icons/VerticalWindows.vue';
 import IconButton from './IconButton.vue';
 
-const {isTableViewMode} = storeToRefs(useConfigStore())
+interface Emit{
+  (e:'onchange',value:TypeVisualization): void
+}
 
+const {visualizationMode} = storeToRefs(useConfigStore())
+const emit = defineEmits<Emit>()
+
+const emitOnChange = (visualization:TypeVisualization) =>{
+  visualizationMode.value = visualization
+  emit('onchange',visualization)
+}
 
 </script>
 
 <template>
-<div class="h-16 flex items-center justify-between">
+  <div class="h-16 flex items-center justify-between">
     <div class="flex items-center">
         <div class="flex items-center">
             <div class="flex items-center space-x-2">
                 <IconButton
-                  :is-active="isTableViewMode == TypeVisualization.Table"
-                  @on-click="() => isTableViewMode = TypeVisualization.Table"
+                  :is-active="visualizationMode == TypeVisualization.Table"
+                  @on-click="() => emitOnChange(TypeVisualization.Table)"
                  >
                   <TableIcon />
                 </IconButton>
                 <IconButton
-                  :is-active="isTableViewMode == TypeVisualization.Vertical"
-                  @on-click="() => isTableViewMode = TypeVisualization.Vertical"
+                  :is-active="visualizationMode == TypeVisualization.Vertical"
+                  @on-click="() => emitOnChange(TypeVisualization.Vertical)"
                  >
                   <VerticalWindows />
                 </IconButton>
-                <IconButton
-                  :is-active="isTableViewMode == TypeVisualization.Calendar"
-                  @on-click="() => isTableViewMode = TypeVisualization.Calendar"
+                <!-- <IconButton
+                  :is-active="visualizationMode == TypeVisualization.Calendar"
+                  @on-click="() => emitOnChange(TypeVisualization.Calendar)"
                  >
                   <CalendarIcon />
-                </IconButton>
+                </IconButton> -->
             </div>
         </div>
     </div>
