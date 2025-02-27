@@ -25,8 +25,9 @@ xTo.value = xToList.value.join(",")
 
 <template>
     <li :class="{'bg-[#580696]': isSelected,'hover:bg-[#ebebff] transition-colors':!isSelected}"
-      class="py-5 border-b px-3 transition"
+      class="py-5 border-b px-3 transition relative"
     >
+      <slot></slot>
       <div :class="{'font-medium !text-[#ba86ef]':isSelected}" class="text-base break-words italic text-gray-600">{{dateFormated}}</div>
       <a href="#" class="flex flex-col justify-between  w-full ">
         <h3 :class="{'text-[#e5ceff]':isSelected}" class="text-lg font-semibold     text-nowrap text-ellipsis w-full overflow-hidden">{{ xFrom }}</h3>

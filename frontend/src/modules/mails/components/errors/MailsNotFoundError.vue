@@ -12,7 +12,7 @@ const {onlyTitle} = defineProps<Props>()
 
 <template>
   <div class="w-full flex flex-col justify-center items-center">
-      <MagnifyingGlassImage class="max-w-[300px]"/>
+      <MagnifyingGlassImage class="max-w-[200px] mobile-sm:max-w-[300px] "/>
       <div class="text-center">
         <h1 class="text-gray-800 text-lg font-semibold ">We didnt find anything</h1>
         <h2 class="text-gray-500 text-base font-semibold" v-if="!onlyTitle">Try a different words</h2>

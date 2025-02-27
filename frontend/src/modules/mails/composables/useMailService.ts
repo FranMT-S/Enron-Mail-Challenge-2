@@ -1,5 +1,5 @@
 import type { Mail } from "@/models/Mails";
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import { fetchGetMailByID, fetchGetMails } from "../services/mailservice";
 import { ResponseError, type IResponseError, type ResponseMailSummary } from "@/models/Response";
 
@@ -61,6 +61,8 @@ export const useMailService = () => {
 
     return mail
   }
+
+  onUnmounted(() => abortPreviousRequest())
 
   return {
     controller,

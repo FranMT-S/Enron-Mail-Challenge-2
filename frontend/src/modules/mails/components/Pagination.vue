@@ -77,8 +77,8 @@ const onChangeItemsPerList = (e:Event) =>{
 
 <template>
 
-    <div class="flex items-end justify-center flex-col">
-        <section class="text-sm text-gray-500 flex flex-row divide-x-2 gap-[5px]">
+    <div class="flex items-end justify-center flex-col mb-[4px] mobile-sm:mb-[0px] max-mobile-sm:gap-y-[4px] ">
+        <section class="text-sm text-gray-500 flex flex-row divide-x-2 gap-[5px] row-gap-[30px]">
           <div class="flex  justify-between gap-[2px] ">
             <div  class="flex flex-row gap-[10px]">
               <input  @keypress="validIsNumber" @input="validatePage"  type="number"  min="1" :max="totalPages" :value="currentPage"
