@@ -62,8 +62,6 @@ const setMail = async (payload:MailSummary) =>{
   }
 }
 
-
-
 const getRelatedMails = async(mail:Mail) =>{
   try {
     let subject = mail.subject.replace(/Re:|FW:/i,"").trim();
@@ -78,6 +76,7 @@ const getRelatedMails = async(mail:Mail) =>{
 }
 
 const goIndex = () => {
+  abortPreviousRequest()
   router.push({name: NamesRouter.Index})
 }
 

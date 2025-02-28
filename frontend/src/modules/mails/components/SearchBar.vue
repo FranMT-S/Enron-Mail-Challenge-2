@@ -2,7 +2,9 @@
 import { ref } from 'vue';
 import FilterIcon from '../../components/icons/FilterIcon.vue';
 import SearchIcon from '../../components/icons/SearchIcon.vue';
-import SearchBarFilterModal, { type IFilterFormData } from './SearchBarFilterModal.vue';
+import SearchBarFilterModal from './SearchBarFilterModal.vue';
+import type { IFilterFormData } from '@/models/FormFilter';
+import { formatDateYYYYMMDD } from '@/helpers/formatDate';
 
 interface IEvents {
   (e: 'on-search',query:string): void
@@ -33,7 +35,23 @@ const onSubmit = (data:IFilterFormData) =>{
     if(!data[key])
       continue;
 
-      newQuery += `${key}:(${data[key]}) `;
+    switch (key) {
+      case 'after':
+      case 'before':
+      case 'since':
+      case 'until':
+        const date = data[key]
+        if(!date)
+          break
+        const dateFormated = formatDateYYYYMMDD(date)
+        newQuery += `${key}:(${dateFormated}) `
+        break;
+
+      default:
+        newQuery += `${key}:(${data[key]}) `;
+        break;
+    }
+
   }
 
   query.value = newQuery;
