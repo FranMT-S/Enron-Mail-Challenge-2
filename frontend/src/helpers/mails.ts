@@ -6,7 +6,7 @@ export const formatXField = (value:string) =>{
 }
 
 
-export const sanatizeBodyMail = (mail:Mail) =>{
+export const sanitizeBodyMail = (mail:Mail) =>{
   return DOMPurify.sanitize(mail.body,{
       FORBID_ATTR: ['href']
   })

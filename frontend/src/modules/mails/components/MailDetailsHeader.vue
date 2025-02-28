@@ -4,6 +4,7 @@ import { formatXField } from '@/helpers/mails';
 import type { Mail } from '@/models/Mails';
 import { ref, watchEffect } from 'vue';
 import Chip from './Chip.vue';
+import Highlight from './Highlight.vue';
 
 interface Props {
   mail:Mail
@@ -31,7 +32,7 @@ watchEffect(() =>{
       <div class="flex flex-col gap-[3px]">
         <h3 class="font-semibold text-lg text-ellipsis text-nowrap overflow-hidden">{{xFrom}} <{{mail.from}}></h3>
         <div class="flex flex-row gap-[4px] flex-wrap text-gray-700">
-          To: <Chip v-for="xTo in xToList" :value="xTo"/>
+          To: <Chip v-for="xTo in xToList"><Highlight>{{ xTo }} </Highlight></Chip>
         </div>
       </div>
     </div>

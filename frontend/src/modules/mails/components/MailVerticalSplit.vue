@@ -16,20 +16,20 @@ const props =  defineProps<MailsProps>()
 const { emailSummarySelected } = storeToRefs(useMailsStore())
 const { getEmail,resetEmailSummarySelected } = useMailsStore()
 const {error:err,isLoading:loading,mails} =  toRefs(props)
-const isLoading = ref(loading)
-const error = ref(err)
+const isLoading = ref(loading.value)
+const error = ref(err.value)
 const mail = ref<Mail | undefined>(undefined)
 
 const onSelectMail = async (mailSummary:MailSummary) =>{
   emailSummarySelected.value = mailSummary
-  loading.value = true
   error.value = undefined
   try {
+    isLoading.value = true
     mail.value = await getEmail(mailSummary.id)
-    loading.value = false
+    isLoading.value = false
   } catch (err) {
     if(!isAbortError(err))
-      loading.value = false
+      isLoading.value = false
     error.value = ValidateError(err)
   }
 }
@@ -50,7 +50,7 @@ watch(mails, () => {
           :mail="mail" :isSelected="mail.id == emailSummarySelected?.id"
         >
           <span
-            @click="() => navigateToDetails(mail.id)"
+            @click.stop="() => navigateToDetails(mail.id)"
             title="Fullpage"
             class="hidden group-hover:block absolute right-[10px] text-[#630078]  cursor-pointer "
             :class="{'!text-white !block':mail.id == emailSummarySelected?.id,}"

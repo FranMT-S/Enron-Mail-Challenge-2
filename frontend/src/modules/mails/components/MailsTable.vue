@@ -13,7 +13,7 @@ import MailsTableRow from './MailsTableRow.vue';
 import MailsError from './errors/MailsError.vue';
 import MailLoader from './MailLoader.vue';
 import {  type MailsEmit, type MailsProps } from '@/models/mailProps';
-
+import Highlight from './Highlight.vue';
 
 const props = defineProps<MailsProps>();
 
@@ -68,16 +68,16 @@ const onSelectMail = (index:number) =>{
                   class=" h-[34px] border-b border-gray-200 shadow-purple cursor-pointer  hover:text-[#fff] bg-deg-purple-2_hover"
                 >
                     <MailsTableRow>
-                      <span class="font-medium">{{ mail.from }}</span>
+                      <Highlight class="font-medium" >{{ mail.from }}</Highlight>
                     </MailsTableRow>
                     <MailsTableRow>
-                      <span>{{ mail.to }}</span>
+                      <Highlight>{{ mail.to }}</Highlight>
                     </MailsTableRow>
                     <MailsTableRow>
-                      <span>{{ mail.subject }}</span>
+                      <Highlight>{{ mail.subject }}</Highlight>
                     </MailsTableRow>
                     <MailsTableRow>
-                      <span> {{ mail.date }}</span>
+                      <Highlight> {{ mail.date }}</Highlight>
                     </MailsTableRow>
                   </tr>
               </template>

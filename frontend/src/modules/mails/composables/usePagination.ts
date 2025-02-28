@@ -6,14 +6,20 @@ export const usePagination = (
   Total:Ref<number> = ref(1)
 ) => {
 
-  if(Total.value < 1 )
-    Total.value = 1
+  const total = ref(Total.value)
+
+  watch(() => Total.value,(newValue) =>{
+    if(newValue < 1 )
+      newValue = 1
+
+    total.value = newValue
+  })
 
   const totalPages = computed(() => {
-    if(Total.value <= 0)
+    if(total.value <= 0)
       return 1
 
-    return Math.ceil(Total.value / itemsPerPage.value)
+    return Math.ceil(total.value / itemsPerPage.value)
   });
   if(InitialPage.value > totalPages.value)
     InitialPage.value = totalPages.value

@@ -1,30 +1,27 @@
 <script setup lang="ts">
+import { TypeVisualization } from '@/enums/TypeVisualization';
 import { isAbortError, ValidateError } from '@/helpers/errors';
+import { navigateToDetails } from '@/helpers/navigate';
 import type { MailSummary } from '@/models/Mails';
-import { type ResponseMailSummary } from '@/models/Response';
 import { storeToRefs } from 'pinia';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import MailsTable from '../components/MailsTable.vue';
+import MailVerticalSplit from '../components/MailVerticalSplit.vue';
 import NavBar from '../components/NavBar.vue';
 import OptionsBar from '../components/OptionsBar.vue';
 import Pagination from '../components/Pagination.vue';
 import { useDebounce } from '../composables/useDebounce';
-import { useSearchStore } from '../store/useSearchStore';
-import { useMailsStore } from '../store/useMailsStore';
 import { useConfigStore } from '../store/useConfig';
-import { TypeVisualization } from '@/enums/TypeVisualization';
-import MailVerticalSplit from '../components/MailVerticalSplit.vue';
-import router from '@/routes';
-import { NamesRouter } from '@/routes/routesNames';
-import { navigateToDetails } from '@/helpers/navigate';
+import { useMailsStore } from '../store/useMailsStore';
+import { useSearchStore } from '../store/useSearchStore';
 
-const itemPerPageList = [100,500,1000]
+const itemPerPageList = ref([100,500,1000])
 const {queryString,itemPerPage,page} = storeToRefs(useSearchStore())
 const {fillEmailsSummary,resetEmailSummarySelected } = useMailsStore()
 const {emailsSummary,total} = storeToRefs(useMailsStore())
 const {visualizationMode} = storeToRefs(useConfigStore())
 
-itemPerPage.value = itemPerPageList[0]
+itemPerPage.value = itemPerPageList.value[0]
 
 const isLoading = ref(false)
 const error = ref<Error | undefined>()
@@ -79,7 +76,7 @@ onMounted(async () => {
   <NavBar @on-search="onChangeQuery"/>
   <div   class="w-full    flex overflow-x-auto custom-scrollbar px-[20px] mb-5">
     <div class="flex-1 px-2 grid grid-rows-[auto_1fr] bg-white shadow-xl rounded-lg" >
-        <div class="flex flex-row justify-between mx-[20px] max-mobile-sm:flex-col ">
+      <div class="flex flex-row justify-between mx-[20px] max-mobile-sm:flex-col ">
           <OptionsBar @onchange="onChangeVisualization"/>
           <Pagination
             @on-change-page="onChangePage"

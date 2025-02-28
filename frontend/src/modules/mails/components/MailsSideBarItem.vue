@@ -3,6 +3,7 @@ import { formatDate } from '@/helpers/formatDate';
 import { formatXField } from '@/helpers/mails';
 import type { MailSummary } from '@/models/Mails';
 import { ref } from 'vue';
+import Highlight from './Highlight.vue';
 
 interface Props {
   mail:MailSummary,
@@ -25,15 +26,27 @@ xTo.value = xToList.value.join(",")
 
 <template>
     <li :class="{'bg-[#580696]': isSelected,'hover:bg-[#ebebff] transition-colors':!isSelected}"
-      class="py-5 border-b px-3 transition relative"
+      class="py-5 border-b px-3 transition relative cursor-pointer"
     >
       <slot></slot>
       <div :class="{'font-medium !text-[#ba86ef]':isSelected}" class="text-base break-words italic text-gray-600">{{dateFormated}}</div>
-      <a href="#" class="flex flex-col justify-between  w-full ">
-        <h3 :class="{'text-[#e5ceff]':isSelected}" class="text-lg font-semibold     text-nowrap text-ellipsis w-full overflow-hidden">{{ xFrom }}</h3>
-        <p :class="{'!text-[#d1cdd2]':isSelected}" class="text-md text-gray-700    text-nowrap text-ellipsis w-full overflow-hidden">To: {{ xTo }}</p>
-        <h3 :class="{'!text-[#ffe1e1]':isSelected}" class="text-lg font-semibold text-gray-800      text-nowrap text-ellipsis w-full overflow-hidden">{{ mail.subject }}</h3>
-      </a>
+      <div  class="flex flex-col justify-between  w-full ">
+        <h3 :class="{'text-[#e5ceff]':isSelected}" class="text-lg font-semibold     text-nowrap text-ellipsis w-full overflow-hidden">
+          <Highlight>
+            {{ xFrom }}
+          </Highlight>
+        </h3>
+        <p :class="{'!text-[#d1cdd2]':isSelected}" class="text-md text-gray-700    text-nowrap text-ellipsis w-full overflow-hidden">To:
+          <Highlight>
+            {{ xTo }}
+          </Highlight>
+        </p>
+        <h3 :class="{'!text-[#ffe1e1]':isSelected}" class="text-lg font-semibold text-gray-800      text-nowrap text-ellipsis w-full overflow-hidden">
+          <Highlight>
+            {{ mail.subject }}
+          </Highlight>
+        </h3>
+      </div>
     </li>
 </template>
 

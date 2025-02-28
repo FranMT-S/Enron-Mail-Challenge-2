@@ -1,9 +1,12 @@
 import { API_URL } from "@/constants/varEnviroment";
 import { fetchCustom } from "@/helpers/fetch";
+import { sanitizeInput } from "@/helpers/regex";
 
 const baseURL = new URL(API_URL + "/")
 
 export function fetchGetMails(query:string = "", page:number = 1, size:number=  30){
+
+  query = sanitizeInput(query);
 
   const controller = new AbortController()
   const url = new URL("mails",baseURL)
