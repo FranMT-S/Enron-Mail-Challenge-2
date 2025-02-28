@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/db"
@@ -13,7 +12,6 @@ import (
 
 func TestQueryBuilderfunc(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("query")
-	fmt.Println("Query:", query)
 	page, err := middlewares.Paginator.GetPageFromContext(r)
 
 	if err != nil {

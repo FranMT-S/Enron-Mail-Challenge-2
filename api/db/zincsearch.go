@@ -23,11 +23,11 @@ type zinchsearchDB struct {
 func NewZinchSearchDB() *zinchsearchDB {
 	transport := &http.Transport{
 		DialContext: (&net.Dialer{
-			Timeout:   5 * time.Second,
+			Timeout:   10 * time.Second,
 			KeepAlive: 30 * time.Second,
 		}).DialContext,
-		TLSHandshakeTimeout:   5 * time.Second,
-		ResponseHeaderTimeout: 5 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ResponseHeaderTimeout: 10 * time.Second,
 		MaxIdleConns:          20, // only one host isn't necessary many connections
 		MaxConnsPerHost:       20, // only one host isn't necessary many connections
 		MaxIdleConnsPerHost:   20,

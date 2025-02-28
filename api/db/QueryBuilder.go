@@ -26,7 +26,7 @@ func QueryBuilder(queryString string, page, size int, fields []string) (*models.
 	fieldRegex := fmt.Sprintf(`%v:(%v|\S+)`, NameFieldWithSpecialCharacters, valueInnerParentheses)
 
 	searchFieldsExpresionRegex := regexp.MustCompile(fieldRegex)
-	fmt.Println("\\")
+
 	matchFieldsExpresionList := searchFieldsExpresionRegex.FindAllString(queryString, -1)
 
 	if errRes := processAndAddFilteringQueries(QueryModel, matchFieldsExpresionList); errRes != nil {
