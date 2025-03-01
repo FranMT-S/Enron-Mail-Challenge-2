@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-func FindFilesAsync(dir string, fileChan chan<- string, wg *sync.WaitGroup, semaphore *semaphore) {
+func FindFilesAsync(dir string, fileChan chan<- string, wg *sync.WaitGroup, semaphore *Semaphore) {
 
 	defer wg.Done()
 

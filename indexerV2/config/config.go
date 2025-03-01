@@ -11,8 +11,6 @@ import (
 
 var (
 	CFG                   *Config
-	IS_PROFILER           bool
-	IS_PROFILER_TRACER    bool
 	ZINC_URL_API          string
 	ZINC_BULK_API_URL     string
 	ZINC_CREATE_INDEX_URL string
@@ -27,7 +25,7 @@ type Config struct {
 	DatabaseName     string
 }
 
-func LoadConfig() {
+func LoadEnviromentConfig() {
 	shared.CreateFolderIfNotExist("./profiling")
 	shared.CreateFolderIfNotExist("./logs")
 	loadEnv()
@@ -47,8 +45,6 @@ func loadEnv() {
 	}
 
 	IS_DEVELOPMENT = os.Getenv("APP_ENV") == "development"
-	IS_PROFILER = os.Getenv("PROFILER") == "true"
-	IS_PROFILER_TRACER = os.Getenv("PROFILER_TRACE") == "true"
 
 	ZINC_URL_API = CFG.DatabaseHost + ":" + CFG.DatabasePort + "/api"
 	ZINC_BULK_API_URL = ZINC_URL_API + "/_bulkv2"
