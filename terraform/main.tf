@@ -5,6 +5,11 @@ resource "aws_instance" "ec2-mails" {
   key_name        = var.key_name
   subnet_id     = aws_subnet.subnet_mails_client.id 
   associate_public_ip_address = true
+ 
+  metadata_options {
+    http_tokens = "required"  
+    http_endpoint = "enabled"
+  }
 
   vpc_security_group_ids  = [
     aws_security_group.sg_allow_zinc.id,
@@ -13,6 +18,8 @@ resource "aws_instance" "ec2-mails" {
     aws_security_group.sg_allow_client.id,
     aws_security_group.sg_egress_allow_all.id
   ]
+
+
   
   user_data = file("dependencies.sh")
 
