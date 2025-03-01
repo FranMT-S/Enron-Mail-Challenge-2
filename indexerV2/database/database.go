@@ -23,17 +23,17 @@ type zincDatabase struct {
 func ZincDatabase() *zincDatabase {
 	if z_database == nil {
 		transport := &http.Transport{
-			TLSHandshakeTimeout:   10 * time.Second,
-			ResponseHeaderTimeout: 10 * time.Second,
+			TLSHandshakeTimeout:   30 * time.Second,
+			ResponseHeaderTimeout: 30 * time.Second,
 			MaxIdleConns:          20, // only one host isn't necessary many connections
 			MaxConnsPerHost:       20, // only one host isn't necessary many connections
 			MaxIdleConnsPerHost:   10,
-			IdleConnTimeout:       30 * time.Second,
+			IdleConnTimeout:       60 * time.Second,
 		}
 
 		z_database = &zincDatabase{client: &http.Client{
 			Transport: transport,
-			Timeout:   time.Second * 30,
+			Timeout:   time.Second * 60,
 		}}
 	}
 
