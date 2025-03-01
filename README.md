@@ -1,24 +1,24 @@
 # Enron Mail
 
-Esta aplicacion permite indexar el dataset de correos de Enron Corporation. para luego poder ser visualizados en una pagina web.
+This application allows you to index the Enron Corporation email dataset, which can then be viewed on a web page.
 
-# Requerimientos
+# Requirements
 * Golang >=1.21
 * Zincsearch
-* nodejs >=22.0.0
+* Node.js >=22.0.0
 
+* Enron Mail Dataset
 
-* Enron Mail Data set
+### Enron Mail Dataset
 
-### Enron Mail Data set
-
-Si usas linux puedes descargarlo de aqui
+If you're using Linux, you can download it from here:
 ```bash
 curl -L http://www.cs.cmu.edu/~enron/enron_mail_20110402.tgz -o enron_mail_20110402.tgz && tar -xf enron_mail_20110402.tgz
 ```
 
 ## Zincsearch
-la base de datos usada es [ZincSearch](https://github.com/zincsearch/zincsearch) puedes descargarlo en su pagina oficial o levantar el contenedor que se encuentra en el directorio IndexerV2, primero se debe crear una red en docker
+
+The database used is [ZincSearch](https://github.com/zincsearch/zincsearch). You can download it from its official page or run the container found in the IndexerV2 directory. First, you need to create a network in Docker:
 
 ```bash
 docker network create mails-network
@@ -28,49 +28,49 @@ docker-compose up
 
 ## IndexerV2
 
-Este programa se encarga de indexar los correos para ejecutarlo debes usar.
+This program is responsible for indexing emails, to run it you must use.
 ```bash
 go run main.go "mails directory"
 ```
 
-tambien acepta algunos flag de configuraciones
+It also accepts some configuration flags
 
-| Opción   | Tipo  | Descripción |
-|----------|-------|-------------|
-| `-batch` | `int` | Batch size para insertar emails en la base de datos. Mín: 100, Máx: 2000, Default: 1000. |
-| `-prof`  | `bool` | Activa trace profiling. No se recomienda usarlo junto con CPU y memory profiling para mejor resultado. Default: false. |
-| `-trace` | `bool` | Activa memory y CPU profiling. No se recomienda usarlo junto con trace profiling para mejor resultado. Default: false. |
-| `-wm`    | `int` | 'Workers mails': Número de procesos para indexar emails. Default: número de CPU, Mín: 1, Máx: 30, Default: 20. |
-| `-wu`    | `int` | 'Workers upload': Número de procesos para subir emails. Mín: 1, Máx: 8, Default: 4. |
+| Option | Type | Description |
+|----------|----------|-------------|
+| `-batch` | `int` | Batch size to insert emails into the database. Min: 100, Max: 2000, Default: 1000. |
+| `-prof` | `bool` | Enables trace profiling. It is not recommended to use it together with CPU and memory profiling for best results. Default: false. |
+| `-trace` | `bool` | Enables memory and CPU profiling. It is not recommended to use it together with trace profiling for best results. Default: false. |
+| `-wm` | `int` | 'Workers mails': Number of processes to index emails. Default: number of CPUs, Min: 1, Max: 30, Default: 20. |
+| `-wu` | `int` | 'Workers upload': Number of processes to upload emails. Min: 1, Max: 8, Default: 4. |
 
 **Example**
 ```batch
 go run main -wm 4 -wu 1 mailsdir
 ```
-#### Configuración de Variables de Entorno
+#### Setting Environment Variables
 
-Este archivo documenta las variables de entorno utilizadas en la aplicación.
+This file documents the environment variables used in the application.
 
-## Variables de Base de Datos
+## Database Variables
 
-| Variable              | Descripción                                      | example |
+| Variable | Description | example |
 |-----------------------|--------------------------------------------------|-------------------|
-| `DATABASE_USER`       | Usuario de la base de datos.                     |           |
-| `DATABASE_PASSWORD`   | Contraseña del usuario de la base de datos.      |  |
-| `DATABASE_HOST`       | URL o dirección del servidor de base de datos.   | `http://localhost` |
-| `DATABASE_PORT`       | Puerto en el que se ejecuta la base de datos.    | `4080`           |
-| `DATABASE_NAME`       | Nombre de la base de datos utilizada.            | `mails`         |
-| `APP_ENV` | Entorno en el que se ejecuta la aplicación. Puede ser `development` o `production`. | `development` |
+| `DATABASE_USER` | Database user. | |
+| `DATABASE_PASSWORD` | Database user password. | |
+| `DATABASE_HOST` | URL or address of the database server. | `http://localhost` |
+| `DATABASE_PORT` | Port on which the database is running. | `4080` |
+| `DATABASE_NAME` | Name of the database used. | `mails` |
+| `APP_ENV` | Environment in which the application is running. Can be `development` or `production`. | `development` |
 
 ## Api
 
-Este es el api que se encargara de obtener los correos de la base de datos para correrlo usa o *Air* si lo tienes instalado, asegurate de llenar las variables de entorno.
+This is the api that will be in charge of getting the emails from the database to run it use *Air* if you have it installed, make sure to fill in the environment variables.
 
 ```
 run go main.go
 ```
 
-O
+Or
 
 ```
 air
@@ -78,12 +78,8 @@ air
 
 ## App (Frontend)
 
-Esta es la aplicacion web que obtendra los datos desde el api para inicializarlo debes usar 
+This is the web application that will get the data from the api to initialize it you must use
 
 ```
 npm run dev
 ```
-
-
-
-
