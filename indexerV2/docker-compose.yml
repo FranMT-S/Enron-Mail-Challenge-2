@@ -1,7 +1,7 @@
 
 services:
   zinc:
-    restart: on-failure:3
+    restart: always
     image: public.ecr.aws/zinclabs/zincsearch:0.4.10
     container_name: zincsearch
     environment:
@@ -14,7 +14,12 @@ services:
       - zinc_data:/data
     networks:
       - mails-network
-    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4080"]
+      interval: 30s
+      retries: 3
+      timeout: 10s
+      start_period: 10s
 networks:
   mails-network:
     external: true
