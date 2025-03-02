@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -20,20 +19,12 @@ func QueryBuilder(queryString string, page, size int, fields []string) (*models.
 		return QueryModel, nil
 	}
 
-	valueInnerParentheses := `\([^)]+\)`
-	NameFieldWithSpecialCharacters := `[-*]?\w+`
-
-	fieldRegex := fmt.Sprintf(`%v:(%v|\S+)`, NameFieldWithSpecialCharacters, valueInnerParentheses)
-
-	searchFieldsExpresionRegex := regexp.MustCompile(fieldRegex)
-
-	matchFieldsExpresionList := searchFieldsExpresionRegex.FindAllString(queryString, -1)
+	matchFieldsExpresionList := GetFieldsExpresionList(queryString)
+	query := CleanFieldsExpresion(queryString)
 
 	if errRes := processAndAddFilteringQueries(QueryModel, matchFieldsExpresionList); errRes != nil {
 		return nil, errRes
 	}
-
-	query := searchFieldsExpresionRegex.ReplaceAllString(queryString, "")
 
 	query = CleanCharacters(query)
 	// replace possible the pattern field without value field:
@@ -52,30 +43,30 @@ func CleanCharacters(s string) string {
 	return s
 }
 
-func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string) *apierrors.ResponseError {
+func GetFieldsExpresionList(queryString string) (fields []string) {
+	searchFieldsExpresionRegex := regexp.MustCompile(helpers.FieldRegex)
+	matchFieldsExpresionList := searchFieldsExpresionRegex.FindAllString(queryString, -1)
 
+	return matchFieldsExpresionList
+}
+
+func CleanFieldsExpresion(queryString string) string {
+	searchFieldsExpresionRegex := regexp.MustCompile(helpers.FieldRegex)
+	return searchFieldsExpresionRegex.ReplaceAllString(queryString, "")
+
+}
+
+func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string) *apierrors.ResponseError {
 	layouts := []string{"2006-01-02", "2006/01/02"}
+	rangeFilter := models.DateRange{}
 
 	for _, field := range fieldsExpresion {
-		isExclusionFilter := false
-		isOperatorOR := false
-		operator := models.AND
 		parts := strings.SplitN(field, ":", 2)
 		if len(parts) < 2 {
 			continue
 		}
 
-		key := strings.ToLower(parts[0])
-		optionsFlag := key[0:1]
-		value := CleanCharacters(parts[1])
-
-		isExclusionFilter = optionsFlag == "-"
-		isOperatorOR = optionsFlag == "*"
-		key = CleanCharacters(key)
-
-		if isOperatorOR {
-			operator = models.OR
-		}
+		key, value, isExclusionFilter, operator := GetFilterInformation(parts)
 
 		switch key {
 		case "since", "until", "before", "after", "date":
@@ -83,8 +74,6 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 			if err != nil {
 				return err
 			}
-
-			rangeFilter := models.DateRange{}
 
 			switch key {
 			case "since":
@@ -100,17 +89,30 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 				rangeFilter.Range.Date.LessThanOrEquals = &date
 			}
 
-			rangeFilter.Range.Date.Format = time.RFC3339
-			Query.AddRangeFilter(rangeFilter)
-
 		default:
 			Query.AddMatchFieldFilter(key, value, operator, isExclusionFilter)
 		}
 	}
 
+	rangeFilter.Range.Date.Format = time.RFC3339
+	Query.AddRangeFilter(rangeFilter)
+
 	return nil
 }
 
-func isEmptyDateRange(dr models.DateRange) bool {
-	return dr == models.DateRange{}
+func GetFilterInformation(parts []string) (key, value string, isExclusionFilter bool, operator models.IOperator) {
+	operator = models.AND
+	key = strings.ToLower(parts[0])
+	optionsFlag := key[0:1]
+	value = CleanCharacters(parts[1])
+
+	isExclusionFilter = optionsFlag == "-"
+	isOperatorOR := optionsFlag == "*"
+	key = CleanCharacters(key)
+
+	if isOperatorOR {
+		operator = models.OR
+	}
+
+	return key, value, isExclusionFilter, operator
 }
