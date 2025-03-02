@@ -1,7 +1,4 @@
 import { createWebHistory, createRouter } from 'vue-router'
-
-import MailsView from '@/modules/mails/views/MailsView.vue'
-import MailDetailsView from '@/modules/mails/views/MailsDetailsView.vue'
 import { NamesRouter } from './routesNames'
 const routes = [
   {
@@ -9,12 +6,12 @@ const routes = [
     children:[
       {
         path: '/',
-        component: MailsView,
+        component: () => import('@/modules/mails/views/MailsView.vue'),
         name:NamesRouter.Index,
       },
       {
         path: '/:id',
-        component: MailDetailsView,
+        component: () => import('@/modules/mails/views/MailsDetailsView.vue'),
         name:NamesRouter.MailDetail
       }
     ]
