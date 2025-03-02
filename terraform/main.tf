@@ -11,6 +11,11 @@ resource "aws_instance" "ec2-mails" {
     http_endpoint = "enabled"
   }
 
+  root_block_device {
+    volume_size = 25 
+    volume_type = "gp2"
+  }
+
   vpc_security_group_ids  = [
     aws_security_group.sg_allow_zinc.id,
     aws_security_group.sg_allow_ssh.id,
