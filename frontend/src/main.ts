@@ -1,5 +1,3 @@
-import 'vuetify/styles'
-import { vuetify } from './plugins/vuetify'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './routes'
@@ -11,5 +9,4 @@ import './styles.css'
 createApp(App)
 .use(router)
 .use(pinia)
-.use(vuetify)
 .mount('#app')

@@ -4,7 +4,6 @@ import { reactive, ref, watch, watchEffect } from 'vue';
 import { useClickOutside } from '../composables/useClickOutside';
 import Slider from './Slider.vue';
 import CrossIcon from '@/modules/components/icons/CrossIcon.vue';
-import DatePicker from './DatePicker.vue';
 import type { IFilterFormData } from '@/models/FormFilter';
 
 
@@ -67,11 +66,9 @@ watch(isBetween, () =>{
   dateBefore.value = null
   dateSince.value = null
   dateUntil.value = null
-
 })
 
 const {formRef} = useClickOutside(handleClickOutside)
-const dateColor = "#500d8e"
 
 </script>
 
@@ -93,54 +90,12 @@ const dateColor = "#500d8e"
                   <span :class="{'font-semibold text-[#2049d5]': isBetween}">Between</span>
                 </div>
                 <div v-if="!isBetween" class="flex gap-[4px] flex-col items-stretch">
-                  <v-date-input
-                    @focus="isPickerOpen = true" @blur="isPickerOpen = false"
-                    label="After Date"
-                    prepend-icon=""
-                    prepend-inner-icon="$calendar"
-                    :color="dateColor"
-                    variant="outlined"
-                    v-model="dateAfter"
-                    clearable
-                     :readonly="false"
-                    date-format="YYYY-MM-DD"
-                  />
-                  <v-date-input
-                    @focus="isPickerOpen = true" @blur="isPickerOpen = false"
-                    label="Before Date"
-                    prepend-icon=""
-                    prepend-inner-icon="$calendar"
-                    :color="dateColor"
-                    variant="outlined"
-                    v-model="dateBefore"
-                    date-format="YYYY-MM-DD"
-                    clearable
-                  />
+                  <SearchBarFilterFieldInput type="date" v-model="dateAfter" label="After"/>
+                  <SearchBarFilterFieldInput type="date" v-model="dateBefore" label="Before"/>
                 </div>
                 <div v-else class="flex items-start flex-wrap gap-[4px] ">
-                  <v-date-input
-                    @focus="isPickerOpen = true" @blur="isPickerOpen = false"
-                    label="Since Date"
-                    prepend-icon=""
-                    prepend-inner-icon="$calendar"
-                    :color="dateColor"
-                    variant="outlined"
-                    v-model="dateSince"
-                    date-format="YYYY-MM-DD"
-                    clearable
-                  />
-                  <v-date-input
-                    @focus="isPickerOpen = true" @blur="isPickerOpen = false"
-                    label="Until Date"
-                    prepend-icon=""
-                    prepend-inner-icon="$calendar"
-                    :color="dateColor"
-                    variant="outlined"
-                    v-model="dateUntil"
-                    date-format="YYYY-MM-DD"
-                    clearable
-                  />
-
+                  <SearchBarFilterFieldInput type="date" v-model="dateSince" label="Since"/>
+                  <SearchBarFilterFieldInput type="date" v-model="dateUntil" label="Until"/>
                 </div>
               </div>
             </section>
