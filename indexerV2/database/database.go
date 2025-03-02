@@ -86,7 +86,7 @@ func (db zincDatabase) PostMails(indexName string, emails []*models.Email) error
 
 	ZincHeader(req)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := db.client.Do(req)
 	if err != nil {
 		return err
 	}

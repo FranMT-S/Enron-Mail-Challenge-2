@@ -1,7 +1,9 @@
 package cmd
 
+import "runtime"
+
 var (
-	defaultMailWorkers   = 20
+	defaultMailWorkers   = runtime.NumCPU()
 	minMailWorkers       = 1
 	maxMailWorkers       = 30
 	defaultBatchSize     = 1000

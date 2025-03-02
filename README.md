@@ -40,7 +40,7 @@ It also accepts some configuration flags
 | `-batch` | `int` | Batch size to insert emails into the database. Min: 100, Max: 2000, Default: 1000. |
 | `-prof` | `bool` | Enables trace profiling. It is not recommended to use it together with CPU and memory profiling for best results. Default: false. |
 | `-trace` | `bool` | Enables memory and CPU profiling. It is not recommended to use it together with trace profiling for best results. Default: false. |
-| `-wm` | `int` | 'Workers mails': Number of processes to index emails. Default: number of CPUs, Min: 1, Max: 30, Default: 20. |
+| `-wm` | `int` | 'Workers mails': Number of processes to index emails. the default is the number of CPUs, Min: 1, Max: 30, Default: number of CPUs. |
 | `-wu` | `int` | 'Workers upload': Number of processes to upload emails. Min: 1, Max: 8, Default: 4. |
 
 **Example**
