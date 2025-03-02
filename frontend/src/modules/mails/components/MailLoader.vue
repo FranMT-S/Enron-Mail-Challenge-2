@@ -3,9 +3,7 @@
     showText:boolean
   }
 
-  const {showText} = withDefaults(defineProps<Props>(), {
-    showText: true,
-  });
+  const {showText = false} =   defineProps<Props>()
 
 </script>
 
