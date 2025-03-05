@@ -34,6 +34,10 @@ const onSelectMail = async (mailSummary:MailSummary) =>{
   }
 }
 
+watch(loading, () =>{
+  isLoading.value = loading.value
+})
+
 watch(mails, () => {
   resetEmailSummarySelected()
 })

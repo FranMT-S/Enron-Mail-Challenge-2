@@ -22,7 +22,6 @@ const props = withDefaults(defineProps<Props>(),{
 const {queries} = toRefs(props)
 const {isActive} = toRefs(props)
 const { hightlightWords } = useSearchStore()
-const ql = ref(!queries.value ?  hightlightWords : queries.value)
 
 const queriesList = computed(() =>{
 
@@ -51,7 +50,6 @@ const GetHightLightTag = (queries:Set<string>,text:string) =>{
   const highlightRegex = createHightlightRegex(queries)
   let match:RegExpExecArray | null = null
   const matches:RegExpExecArray[] = []
-
   while((match = highlightRegex.exec(text)) != null){
     matches.push(match)
   }
@@ -65,7 +63,8 @@ const createHightlightRegex = (queries:Set<string>) =>{
   let regexString = ""
   for(var query of queries){
     query = query.replace(NotNumberLettersOrMailCharactersRegex,"")
-    regexString += "|"  + query
+    if(query.length > 0)
+      regexString += "|"  + query
   }
 
   // clean the first |
@@ -116,5 +115,5 @@ watch([textHighlightTag,isActive],() => {
 </script>
 
 <template>
-  <span ref="textRef" class="content"><slot></slot></span>
+  <span ref="textRef" class="contents"><slot></slot></span>
 </template>

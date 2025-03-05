@@ -6,6 +6,7 @@
 
   interface Props{
     isActive?:boolean,
+    title?:string,
   }
 
   const emit = defineEmits<Events>()
@@ -18,7 +19,7 @@
 <template>
   <button
       :class="[isActive ? 'text-purple-600' : 'text-gray-300 button']"
-      @click="onClick" title="TableMode" class=" p-[3px] border border-gray-300 rounded-lg shadow  ">
+      @click="onClick" :title="title" class=" p-[3px] border border-gray-300 rounded-lg shadow  ">
       <slot></slot>
   </button>
 </template>

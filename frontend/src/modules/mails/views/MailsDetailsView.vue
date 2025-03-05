@@ -92,7 +92,7 @@ onUnmounted(() => abortPreviousRequest())
 
 <template>
 <main class="grid grid-cols-[min(30vw,250px)_minmax(50vw,100%)] w-full h-full shadow-lg rounded-3xl col-span-2 row-span-2 p-4  gap-[25px]" >
-      <MailsSideBar @onselectmail="setMail"  :mails="relatedMails" :idMailSelected="mail?.id" title="Related emails">
+      <MailsSideBar @onselectmail="setMail"  :mails="relatedMails" :idMailSelected="mail?.id" title="Similar Subject">
         <div class="flex sticky top-0 pt-[6px] bg-[#fff] z-10">
             <BackArrow @click="() => goIndex()"  class="cursor-pointer h-[30px] text-[#7a03ea]  hover:opacity-90 opacity-70 "/>
         </div>
