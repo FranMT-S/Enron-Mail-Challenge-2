@@ -30,6 +30,7 @@ const formData = reactive<IFilterFormData>({
   before:null,
   since:null,
   until:null,
+  exclude:null,
 })
 
 const dateAfter = ref<Date|null>(null)
@@ -78,9 +79,10 @@ const {formRef} = useClickOutside(handleClickOutside)
         <div class="max-w-md mx-auto">
           <div class="divide-y divide-gray-200">
             <section class=" text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-              <SearchBarFilterFieldInput type="text" v-model="formData.from" label="From"/>
-              <SearchBarFilterFieldInput type="text" v-model="formData.to" label="To"/>
-              <SearchBarFilterFieldInput type="text" v-model="formData.subject" label="Subject"/>
+              <SearchBarFilterFieldInput type="text" v-model="formData.from" label="From" placeholder="emails"/>
+              <SearchBarFilterFieldInput type="text" v-model="formData.to" label="To" placeholder="emails"/>
+              <SearchBarFilterFieldInput type="text" v-model="formData.subject" label="Subject" />
+              <SearchBarFilterFieldInput type="text" v-model="formData.exclude" label="Exclude" />
 
               <div class="flex flex-col  gap-[4px] border-gray-200 border p-[10px] rounded-[5px] py-[12px]">
                 <div class="flex flex-row row gap-[10px] mb-[8px] ">
@@ -100,10 +102,10 @@ const {formRef} = useClickOutside(handleClickOutside)
               </div>
             </section>
             <footer class="pt-4 flex items-center gap-4 mb-[5px]">
-                <button @click="close" class="flex justify-center items-center border opacity-70 hover:opacity-100 border-red-500 text-red-500 hover:text-white hover:bg-red-500 w-full  px-4 py-3 rounded-md focus:outline-none">
-                  <CrossIcon/>Cancel
+                <button @click="close" class="min-w-fit flex shrink justify-center items-center border opacity-70 hover:opacity-100 border-red-500 text-red-500 hover:text-white hover:bg-red-500 w-full px-[2px] py-[2px]  mobile-sm:px-4 mobile-sm:py-3 rounded-md focus:outline-none">
+                  <CrossIcon class="hidden mobile:block"/>Cancel
                 </button>
-                <button type="submit" class="bg-blue-500 flex hover:bg-blue-600  justify-center items-center w-full text-white px-4 py-3 rounded-md focus:outline-none">Create</button>
+                <button type="submit" class="bg-blue-500 flex hover:bg-blue-600  justify-center items-center w-full text-white px-[2px] py-[2px] mobile-sm:px-4 mobile-sm:py-3 rounded-md focus:outline-none">Create</button>
             </footer>
           </div>
         </div>

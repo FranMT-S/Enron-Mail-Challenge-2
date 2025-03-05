@@ -1,6 +1,7 @@
 export interface IFilterFormData {
   from?:string | null,
   to?:string | null,
+  exclude?:string | null,
   subject?:string | null,
   after?:Date | null,
   before?:Date | null,

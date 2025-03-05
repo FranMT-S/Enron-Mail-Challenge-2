@@ -3,6 +3,7 @@ import { useMailService } from "../composables/useMailService";
 import type { ResponseMailSummary } from "@/models/Response";
 import type { Mail, MailSummary } from "@/models/Mails";
 import { reactive, ref } from "vue";
+import type { SortField } from "@/models/Sort";
 
 export const useMailsStore = defineStore('mails',() =>{
 
@@ -12,10 +13,10 @@ export const useMailsStore = defineStore('mails',() =>{
   const emailSummarySelected = ref<MailSummary | undefined>(undefined)
   const total = ref(0)
 
-  const fillEmailsSummary = async (query:string = "", page:number = 1, size:number=  30) => {
+  const fillEmailsSummary = async (query:string = "", page:number = 1, size:number=  30,sortList:SortField[] = []) => {
     try {
       emailsSummary.value = []
-      const mails:ResponseMailSummary = await getMails(query,page,size)
+      const mails:ResponseMailSummary = await getMails(query,page,size,sortList)
       total.value = mails.total
       emailsSummary.value = mails.emails
     } catch (err) {

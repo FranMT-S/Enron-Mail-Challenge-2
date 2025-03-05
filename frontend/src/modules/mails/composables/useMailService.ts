@@ -2,6 +2,7 @@ import type { Mail } from "@/models/Mails";
 import { onUnmounted, ref } from "vue";
 import { fetchGetMailByID, fetchGetMails } from "../services/mailservice";
 import { ResponseError, type IResponseError, type ResponseMailSummary } from "@/models/Response";
+import type { SortField } from "@/models/Sort";
 
 
 export const useMailService = () => {
@@ -13,11 +14,11 @@ export const useMailService = () => {
     }
   }
 
-  const getMails = async (query:string = "", page:number = 1, size:number=  30, isAbortPreviousRequest = true) => {
+  const getMails = async (query:string = "", page:number = 1, size:number=  30,sortList:SortField[] = [], isAbortPreviousRequest = true) => {
     if(isAbortPreviousRequest)
       abortPreviousRequest()
 
-    const {response,controller:co} =  fetchGetMails(query,page,size);
+    const {response,controller:co} =  fetchGetMails(query,page,size,sortList);
     controller.value = co;
     const res  = await response
 

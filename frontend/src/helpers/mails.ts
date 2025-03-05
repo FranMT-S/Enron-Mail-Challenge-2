@@ -2,7 +2,13 @@ import type { Mail } from '@/models/Mails';
 import DOMPurify from 'dompurify';
 
 export const formatXField = (value:string) =>{
-  return value.split(/<[^>]+>,?\s?/).filter(Boolean)
+  let users = value.split(/<[^>]+>,?\s?|',/)
+  if(users.length == 1){
+    // X_to format only names without metadata
+    users = value.split(",")
+  }
+
+  return users.map(w => w.replace("'","").trim()).filter(Boolean)
 }
 
 

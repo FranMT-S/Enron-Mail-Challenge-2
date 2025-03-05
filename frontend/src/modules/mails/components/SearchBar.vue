@@ -46,7 +46,9 @@ const onSubmit = (data:IFilterFormData) =>{
         const dateFormated = formatDateYYYYMMDD(date)
         newQuery += `${key}:(${dateFormated}) `
         break;
-
+      case 'exclude':
+        newQuery += data['exclude']?.split(' ').map(w => "-" + w).join(" ")
+        break
       default:
         newQuery += `${key}:(${data[key]}) `;
         break;

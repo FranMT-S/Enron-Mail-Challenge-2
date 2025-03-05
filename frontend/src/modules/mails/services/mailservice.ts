@@ -1,10 +1,11 @@
 import { API_URL } from "@/constants/varEnviroment";
 import { fetchCustom } from "@/helpers/fetch";
 import { sanitizeInput } from "@/helpers/regex";
+import type { SortField } from "@/models/Sort";
 
 const baseURL = new URL(API_URL + "/")
 
-export function fetchGetMails(query:string = "", page:number = 1, size:number=  30){
+export function fetchGetMails(query:string = "", page:number = 1, size:number=  30,sortList:SortField[] = []){
 
   query = sanitizeInput(query);
 
@@ -13,6 +14,15 @@ export function fetchGetMails(query:string = "", page:number = 1, size:number=  
   url.searchParams.set('query',query)
   url.searchParams.set('page',page.toString())
   url.searchParams.set('size',size.toString())
+
+  if(sortList.length > 0){
+    let sortString = ""
+    for(var s of sortList){
+      sortString += `,${s.field}.${s.sort}`
+    }
+    sortString = sortString.substring(1)
+    url.searchParams.set('sort',sortString)
+  }
 
   const response = fetchCustom(url, {
     signal:controller.signal,
