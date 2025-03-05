@@ -18,7 +18,6 @@ const selectedOption = ref<string | number | null | undefined>(options.value[0] 
 const isOpen = ref(false);
 
 const selectOption = (option:number | string) => {
-  console.log(option);
   selectedOption.value = option;
   isOpen.value = false;
   emit('onSelect',option)
