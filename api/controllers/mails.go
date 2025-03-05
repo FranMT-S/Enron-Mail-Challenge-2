@@ -3,9 +3,11 @@ package controllers
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/helpers"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/middlewares"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/services"
@@ -35,19 +37,27 @@ func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		query := r.URL.Query().Get("query")
-		page, err := middlewares.Paginator.GetPageFromContext(r)
+		sortParam := r.URL.Query().Get("sort")
+		sort := strings.Split(sortParam, ",")
+		page, err := middlewares.GetPageFromContext(r)
 		if err != nil {
 			errCh <- err
 			return
 		}
 
-		size, err := middlewares.Paginator.GetSizeFromContext(r)
+		size, err := middlewares.GetSizeFromContext(r)
 		if err != nil {
 			errCh <- err
 			return
 		}
 
-		hits, err := mc.emailService.GetMailsHitsAndTotal(query, page, size)
+		sortFields := helpers.CreateSortFields(sort)
+
+		if len(sortFields) == 0 || sortParam == "" {
+			sortFields = []string{"-date"}
+		}
+
+		hits, err := mc.emailService.GetMailsHitsAndTotal(query, page, size, sortFields)
 		if err != nil {
 			errCh <- err
 			return

@@ -10,10 +10,10 @@ import (
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 )
 
-func QueryBuilder(queryString string, page, size int, fields []string) (*models.Query, *apierrors.ResponseError) {
+func QueryBuilder(queryString string, page, size int, fields []string, sort []string) (*models.Query, *apierrors.ResponseError) {
 	QueryModel := models.NewQuery()
 	from := (page - 1) * size
-	QueryModel.SetFields(fields).SetSize(size).SetFrom(from)
+	QueryModel.SetFields(fields).SetSize(size).SetFrom(from).SetSort(sort)
 	if queryString == "" {
 		QueryModel.SetGetAllQuery()
 		return QueryModel, nil
@@ -40,6 +40,7 @@ func CleanCharacters(s string) string {
 	s = strings.ReplaceAll(s, "(", "")
 	s = strings.ReplaceAll(s, ")", "")
 	s = strings.ReplaceAll(s, "*", "")
+	s = strings.ReplaceAll(s, ",", "")
 	return s
 }
 
@@ -94,8 +95,10 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 		}
 	}
 
-	rangeFilter.Range.Date.Format = time.RFC3339
-	Query.AddRangeFilter(rangeFilter)
+	if !IsEmptyDateRange(rangeFilter) {
+		rangeFilter.Range.Date.Format = time.RFC3339
+		Query.AddRangeFilter(rangeFilter)
+	}
 
 	return nil
 }
@@ -115,4 +118,8 @@ func GetFilterInformation(parts []string) (key, value string, isExclusionFilter 
 	}
 
 	return key, value, isExclusionFilter, operator
+}
+
+func IsEmptyDateRange(dr models.DateRange) bool {
+	return dr == models.DateRange{}
 }

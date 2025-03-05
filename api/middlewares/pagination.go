@@ -23,7 +23,7 @@ var Paginator paginatorFunc = func(maxSize int) func(next http.Handler) http.Han
 
 			page, err := strconv.Atoi(pageParam)
 			if err != nil || page < 1 {
-				page = 1 // Página por defecto
+				page = 1
 			}
 
 			sizeParam := query.Get(constants.SIZE)
@@ -48,7 +48,7 @@ var Paginator paginatorFunc = func(maxSize int) func(next http.Handler) http.Han
 	}
 }
 
-func (p paginatorFunc) GetPageFromContext(r *http.Request) (int, *apierrors.ResponseError) {
+func GetPageFromContext(r *http.Request) (int, *apierrors.ResponseError) {
 	page, ok := r.Context().Value(constants.PAGE).(int)
 	if !ok {
 		return -1, apierrors.ErrResponsePaginatorNotIsSetup
@@ -56,7 +56,7 @@ func (p paginatorFunc) GetPageFromContext(r *http.Request) (int, *apierrors.Resp
 	return page, nil
 }
 
-func (p paginatorFunc) GetSizeFromContext(r *http.Request) (int, *apierrors.ResponseError) {
+func GetSizeFromContext(r *http.Request) (int, *apierrors.ResponseError) {
 	size, ok := r.Context().Value(constants.SIZE).(int)
 	if !ok {
 		return -1, apierrors.ErrResponsePaginatorNotIsSetup

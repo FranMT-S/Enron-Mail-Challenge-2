@@ -58,6 +58,11 @@ func (zb *Query) SetSize(size int) *Query {
 	return zb
 }
 
+func (zb *Query) SetSort(fields []string) *Query {
+	zb.Sort = fields
+	return zb
+}
+
 func (zb *Query) SetFields(fields []string) *Query {
 	zb.Fields = fields
 	return zb
