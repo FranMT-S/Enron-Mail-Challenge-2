@@ -20,9 +20,9 @@ export const formatDateYYYYMMDD = (date:string | Date) => {
     if (!(date instanceof Date))
       date = new Date(date);
 
-    let month = (date.getMonth() + 1).toString().padStart(2,'0');
-    let day = '' + date.getDate().toString().padStart(2,'0');
-    let year = date.getFullYear();
+    let month = (date.getUTCMonth() + 1).toString().padStart(2,'0');
+    let day = '' + date.getUTCDate().toString().padStart(2,'0');
+    let year = date.getUTCFullYear();
 
   return `${year}-${month}-${day}`;
 
@@ -31,3 +31,12 @@ export const formatDateYYYYMMDD = (date:string | Date) => {
   }
 };
 
+export const OffSetFromDate = (date:Date | undefined | null, daysOffset = 0) =>{
+  if(!date)
+    return undefined
+
+  const offset = new Date(date)
+  offset.setUTCDate(offset.getUTCDate() + daysOffset)
+
+  return formatDateYYYYMMDD(offset)
+}

@@ -98,10 +98,10 @@ const {formRef} = useClickOutside(handleClickOutside)
         @onSelect="onSelect"
       >
         <template #imgAsc>
-          <SortDescLetter class="h-[20px] invisible group-hover/text:visible"/>
+          <SortAscLetter class="h-[20px] invisible group-hover/text:visible"/>
         </template>
         <template #imgDesc>
-          <SortAscLetter class="h-[20px] invisible group-hover/text:visible"/>
+          <SortDescLetter class="h-[20px] invisible group-hover/text:visible"/>
         </template>
       </SortBySelectItem>
     </ul>

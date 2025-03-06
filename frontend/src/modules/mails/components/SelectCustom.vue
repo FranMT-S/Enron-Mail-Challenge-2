@@ -36,17 +36,14 @@ const {formRef} = useClickOutside(handleClickOutside)
 <template>
   <div class="relative w-fit  " ref="formRef">
     <button
-      @click.stop="isOpen = true"
+      @click.prevent.stop="isOpen = !isOpen"
       :class="{ 'border-[#7530be]': isOpen }"
-      class="w-full outline-none bg-white border border-gray-300 rounded-[5px] px-2 py-[1px] text-left flex justify-between items-center"
+      class="w-full h-full outline-none bg-white hover:bg-gray-50 border border-gray-300 rounded-[5px] px-2 py-[1px] text-left flex justify-between items-center"
     >
-      {{ selectedOption }}
+      <p class="text-center w-full">{{ selectedOption }}</p>
       <span :class="{ 'rotate-180 !text-[#792acf]': isOpen }" class="text-gray-400 hover:text-[#792acf] transition duration-100 ms-[5px]">▼</span>
     </button>
-    <ul
-      v-if="isOpen"
-      class="absolute w-full bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10"
-    >
+    <ul v-if="isOpen" class="absolute w-full bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10">
       <li
         v-for="option in options"
         :key="option"
