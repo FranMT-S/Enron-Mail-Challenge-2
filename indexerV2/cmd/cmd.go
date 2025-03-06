@@ -102,6 +102,7 @@ func Start() {
 }
 
 func CheckDirUntilExist() string {
+	shared.PrintfWithColor(shared.TextYellow, "send 'x' if you want exit to the program\n")
 	for {
 		shared.PrintfWithColor(shared.TextGreen, "Enter a directory valid: ")
 		scanner.Scan()
