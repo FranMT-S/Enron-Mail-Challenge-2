@@ -106,7 +106,7 @@ func CheckDirUntilExist() string {
 	for {
 		shared.PrintfWithColor(shared.TextGreen, "Enter a directory valid: ")
 		scanner.Scan()
-		newDir := scanner.Text()
+		newDir := strings.TrimSpace(scanner.Text())
 
 		if strings.ToLower(newDir) == "x" {
 			os.Exit(0)
