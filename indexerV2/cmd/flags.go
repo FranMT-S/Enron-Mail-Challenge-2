@@ -24,13 +24,13 @@ func defineFlag(config *ConfigProgram) {
 		fmt.Sprintf("'workers upload' number of process to upload the mails, min:%v, max:%v, default:%v", minUploadWorkers, maxUploadWorkers, defaultUploadWorkers),
 	)
 
-	flag.BoolVar(&config.isProf,
+	flag.BoolVar(&config.isTracer,
 		"trace",
 		false,
 		"Activate memory and cpu profiling. It is recommended not to use it together with trace profiling for best result. default: false.",
 	)
 
-	flag.BoolVar(&config.isTracer,
+	flag.BoolVar(&config.isProf,
 		"prof",
 		false,
 		"Activate trace profiling. It is recommended not to use it together with CPU and memory profiling  for best result.default: false.",

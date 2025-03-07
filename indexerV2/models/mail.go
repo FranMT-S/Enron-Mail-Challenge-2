@@ -5,10 +5,13 @@ type Email struct {
 	Date                    string `json:"date"`
 	DateTime                string `json:"datetime"`
 	From                    string `json:"from"`
+	FromSort                string `json:"from_sort"`
 	To                      string `json:"to"`
+	ToSort                  string `json:"to_sort"`
 	Bcc                     string `json:"bcc"`
 	Cc                      string `json:"cc"`
 	Subject                 string `json:"subject"`
+	SubjectSort             string `json:"subject_sort"`
 	MimeVersion             string `json:"mime_version"`
 	ContentType             string `json:"content_type"`
 	ContentTransferEncoding string `json:"content_transfer_encoding"`

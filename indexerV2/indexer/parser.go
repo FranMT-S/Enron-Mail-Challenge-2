@@ -102,14 +102,17 @@ func processChunk(chunk string, mail *models.Email, lastFieldUpdated *string, is
 			mail.DateTime = datetime.Format(time.RFC3339)
 		case "from":
 			mail.From += value
+			mail.FromSort += value
 		case "to":
 			mail.To += value
+			mail.ToSort += value
 		case "bcc":
 			mail.Bcc += value
 		case "cc":
 			mail.Cc += value
 		case "subject":
 			mail.Subject += value
+			mail.SubjectSort += value
 		case "mime-version":
 			mail.MimeVersion += value
 		case "content-type":

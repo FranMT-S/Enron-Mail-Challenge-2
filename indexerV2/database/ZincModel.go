@@ -27,10 +27,13 @@ type Properties struct {
 	Date                    Property `json:"date"`
 	DateTime                Property `json:"datetime"`
 	From                    Property `json:"from"`
+	From_Sort               Property `json:"from_sort"`
 	To                      Property `json:"to"`
+	To_Sort                 Property `json:"to_sort"`
 	Bcc                     Property `json:"bcc"`
 	Cc                      Property `json:"cc"`
 	Subject                 Property `json:"subject"`
+	Subject_Sort            Property `json:"subject_sort"`
 	MimeVersion             Property `json:"mime_version"`
 	ContentType             Property `json:"content_type"`
 	ContentTransferEncoding Property `json:"content_transfer_encoding"`

@@ -37,6 +37,7 @@ func NewQuery() *Query {
 		Query: QueryField{
 			Bool: BoolQuery{
 				Must:        make([]any, 0),
+				Should:      make([]any, 0),
 				Not:         make([]any, 0),
 				RangeFilter: make([]DateRange, 0),
 			},
@@ -143,6 +144,7 @@ type QueryField struct {
 
 type BoolQuery struct {
 	Must        []any       `json:"must"`
+	Should      []any       `json:"should"`
 	Not         []any       `json:"must_not"`
 	RangeFilter []DateRange `json:"filter,omitempty"`
 }
