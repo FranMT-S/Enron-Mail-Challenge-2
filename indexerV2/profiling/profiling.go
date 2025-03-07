@@ -52,16 +52,17 @@ func (prof *Profiler) StartMemAndCPUProfiler() {
 	}
 
 	prof.MemProf = memProf
-	runtime.GC()
+
 }
 
 func (prof *Profiler) StopMemAndCPUProfiler() {
 
+	pprof.StopCPUProfile()
 	if prof.CpuProf != nil {
 		prof.CpuProf.Close()
-		pprof.StopCPUProfile()
 	}
 
+	runtime.GC()
 	if prof.MemProf != nil {
 		if err := pprof.WriteHeapProfile(prof.MemProf); err != nil {
 			log.Println("could not write memory profile")
@@ -92,6 +93,6 @@ func (prof *Profiler) StopTracerProfiler() {
 	trace.Stop()
 
 	if prof.tracerProf != nil {
-		prof.tracerProf.Close() //nolint :errcheck
+		prof.tracerProf.Close()
 	}
 }

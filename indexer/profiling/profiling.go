@@ -57,9 +57,9 @@ func (prof *Profiler) StartMemAndCPUProfiler() {
 
 func (prof *Profiler) StopMemAndCPUProfiler() {
 
+	pprof.StopCPUProfile()
 	if prof.CpuProf != nil {
 		prof.CpuProf.Close()
-		pprof.StopCPUProfile()
 	}
 
 	if prof.MemProf != nil {
