@@ -16,6 +16,7 @@ type Indexer struct {
 	MailParser IParserMail
 }
 
+// create a instancie of Indexer that read a mime file from path
 func NewMimeIndexer() Indexer {
 	return Indexer{
 		MailParser: &MimeParse{},

@@ -61,7 +61,6 @@ func Start() {
 	}
 
 	semaphore := shared.NewSemaphore(50)
-
 	mailUploader := indexer.NewMailsUploader(config.CFG.DatabaseName, db.ZincDatabase())
 	mimeIndexer := indexer.NewMimeIndexer()
 	mailsQueoeCh := make(chan *models.Email)
@@ -129,6 +128,8 @@ func CheckDirUntilExist() string {
 	}
 }
 
+// searchs files of mails async and add a new value in the wait group param.
+// semaphore limit the number of gourotines finding for new mails
 func StartSearchMails(dir string, fileChan chan<- string, wg *sync.WaitGroup, semaphore *shared.Semaphore) {
 	wg.Add(1)
 	go func() {

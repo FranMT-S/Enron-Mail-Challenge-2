@@ -19,6 +19,7 @@ func NewErrorHandler() *ErrorHandler {
 	}
 }
 
+// Listen error in the channel, must be use closeAndWait must be used to consume errors.
 func (errHandler *ErrorHandler) Listen() {
 	errHandler.wg.Add(1)
 	go func() {
@@ -26,7 +27,7 @@ func (errHandler *ErrorHandler) Listen() {
 		i := 0
 		for err := range errHandler.errCh {
 			i++
-			LogErrorToCSV("test", err)
+			LogErrorToCSV(err)
 			fmt.Println(fmt.Sprint(i)+"- Error index Mail:", err.Error())
 		}
 	}()
@@ -41,12 +42,12 @@ func (errHandler *ErrorHandler) GetErrCh() chan error {
 	return errHandler.errCh
 }
 
-func (errHandler *ErrorHandler) Submit(err error) chan error {
-	return errHandler.errCh
+func (errHandler *ErrorHandler) Submit(err error) {
+	errHandler.errCh <- err
 }
 
 // logErrorToCSV logs the error and file path to a CSV file.
-func LogErrorToCSV(filePath string, err error) {
+func LogErrorToCSV(err error) {
 	f, fileErr := os.OpenFile("logs/error_log.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if fileErr != nil {
 		fmt.Printf("Error opening error log CSV file: %v\n", fileErr)
@@ -64,7 +65,7 @@ func LogErrorToCSV(filePath string, err error) {
 	}
 
 	if fileInfo.Size() == 0 {
-		err := writer.Write([]string{"timestamp", "filePath", "errorMessage"})
+		err := writer.Write([]string{"timestamp", "errorMessage"})
 		if err != nil {
 			fmt.Printf("Error writing header to error log CSV file: %v\n", err)
 			return
@@ -74,7 +75,6 @@ func LogErrorToCSV(filePath string, err error) {
 	logTime := time.Now().Format(time.ANSIC)
 	record := []string{
 		logTime,
-		filePath,
 		err.Error(),
 	}
 

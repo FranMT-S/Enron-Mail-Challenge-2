@@ -40,6 +40,7 @@ func ZincDatabase() *zincDatabase {
 	return z_database
 }
 
+// Create index in zincsearch if not exist
 func (db zincDatabase) CreateIndex(indexName string) error {
 	index := GetIndexString(indexName)
 	data := strings.NewReader(index)
@@ -64,15 +65,13 @@ func (db zincDatabase) CreateIndex(indexName string) error {
 	}
 
 	if string(body) != fmt.Sprintf(`{"error":"index [%v] already exists"}`, indexName) {
-		// _logs.ColorGreen()
 		fmt.Println("index created")
-		// _logs.ColorWhite()
 	}
 
 	return nil
 }
 
-// BulkRequest makes a request to the database to store the files.
+// Postmail send many mails to database.
 func (db zincDatabase) PostMails(indexName string, emails []*models.Email) error {
 	reader, err := bulkMailReader(indexName, emails)
 	if err != nil {
@@ -96,6 +95,7 @@ func (db zincDatabase) PostMails(indexName string, emails []*models.Email) error
 	return nil
 }
 
+// Create a reader to upload mails in zincsearch
 func bulkMailReader(indexname string, mails []*models.Email) (io.Reader, error) {
 	bulkResponse := models.ZincBulkResponse{
 		Index:   indexname,

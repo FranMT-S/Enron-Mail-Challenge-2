@@ -1,11 +1,11 @@
 package cmd
 
 type ConfigProgram struct {
-	isTracer         bool
-	isProf           bool
-	workersMails     int
-	workersUploaders int
-	batchSize        int
+	isTracer         bool // activate tracer profiling
+	isProf           bool // activate mem and cpu profiling
+	workersMails     int  // workers to index mails
+	workersUploaders int  // workers to upload a batch of mails
+	batchSize        int  // batch size
 }
 
 func validateFields(config *ConfigProgram) {

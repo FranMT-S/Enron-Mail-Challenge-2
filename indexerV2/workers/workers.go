@@ -15,6 +15,23 @@ type Worker[In any, Out any] struct {
 	failedTask    int
 }
 
+/*
+	Create a new instance of worker
+
+Params:
+
+  - id an identification for the worker
+
+  - Job a function that return a value of In and an error
+
+  - TaskQueue chan with data that process by Job
+
+  - ResultQueue optional chan with the result of Job
+
+  - ErrorCh optional chan to receive the errors ​​of Job
+
+  - wg is a WaitGroup that decreases when a task is finalized
+*/
 func NewWorker[In any, Out any](
 	Id int,
 	Job Job[In, Out],
@@ -52,5 +69,4 @@ func (wo *Worker[In, Out]) Start() {
 		}
 		wo.successTask++
 	}
-	// fmt.Printf("worker %v end job\n", wo.id)
 }

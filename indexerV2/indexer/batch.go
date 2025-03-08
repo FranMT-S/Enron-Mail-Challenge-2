@@ -63,10 +63,11 @@ func (bm *BatchMails) CleanBatch() {
 	bm.mails = nil
 }
 
+// Create a batch  from de mails chan and when fill send to receiver
 func BatchQueoue(bathSize int, mailsQueoeCh chan *models.Email, receiver chan []*models.Email, wg *sync.WaitGroup) {
 	defer wg.Done()
 	wg.Add(1)
-	batch := NewBatchMails(1000)
+	batch := NewBatchMails(bathSize)
 
 	for mail := range mailsQueoeCh {
 		batch.Add(mail)

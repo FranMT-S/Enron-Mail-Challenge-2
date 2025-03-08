@@ -24,6 +24,23 @@ type WorkerPool[In any, Out any] struct {
 	Name        string
 }
 
+/*
+	Create a new instance of Workerpool
+
+Params:
+
+  - Job a function that return a value of In and an error
+
+  - TaskQueue chan with data that process by Job
+
+  - ResultQueue optional chan with the result of Job
+
+    Config Config of worked pool:
+
+  - ErrorCh optional chan to receive the errors ​​of Job
+
+  - Workers number of workers to process Job
+*/
 func NewWorkerPool[In any, Out any](Job Job[In, Out], TaskQueue chan In, ResultQueue chan Out, Config WorkerPoolConfig) *WorkerPool[In, Out] {
 
 	if Config.Workers <= 0 {

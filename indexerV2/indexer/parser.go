@@ -16,19 +16,12 @@ type IParserMail interface {
 	ConvertFileToMail(file *os.File) (*models.Email, error)
 }
 
+// Read a file and parse its content to a Email model
 type MimeParse struct {
 }
 
-// var poolMails = &sync.Pool{
-// 	New: func() interface{} {
-// 		// Función que se ejecuta cuando no hay objetos disponibles en el pool
-// 		return &models.Email{}
-// 	},
-// }
-
 func (parser *MimeParse) ConvertFileToMail(file *os.File) (*models.Email, error) {
 	var lastFieldUpdated string
-	// mail := poolMails.Get().(*models.Email)
 	mail := &models.Email{}
 	isHeader := true
 	SizeKB := 4

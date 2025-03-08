@@ -32,7 +32,7 @@ func (prof *Profiler) StartMemAndCPUProfiler() {
 		prof.MemProf.Close()
 	}
 
-	cpuProf, err := os.OpenFile("profiling/cpu.prof", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	cpuProf, err := os.Create("profiling/cpu.prof")
 	if err != nil {
 		log.Println("cannot start  CPU profile")
 		log.Println(err)
@@ -45,7 +45,7 @@ func (prof *Profiler) StartMemAndCPUProfiler() {
 		log.Println(err)
 	}
 
-	memProf, err := os.OpenFile("profiling/mem.prof", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	memProf, err := os.Create("profiling/mem.prof")
 	if err != nil {
 		log.Println("cannot create memory profile")
 		log.Println(err)
@@ -77,7 +77,7 @@ func (prof *Profiler) StartTracerProfiler() {
 		prof.tracerProf.Close()
 	}
 
-	traceFile, err := os.OpenFile("profiling/trace.out", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	traceFile, err := os.Create("profiling/trace.out")
 	if err != nil {
 		fmt.Println("Error creating trace profile:", err)
 	}
