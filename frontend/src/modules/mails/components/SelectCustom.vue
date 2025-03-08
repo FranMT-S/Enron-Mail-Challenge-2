@@ -43,7 +43,7 @@ const {formRef} = useClickOutside(handleClickOutside)
       <p class="text-center w-full">{{ selectedOption }}</p>
       <span :class="{ 'rotate-180 !text-[#792acf]': isOpen }" class="text-gray-400 hover:text-[#792acf] transition duration-100 ms-[5px]">▼</span>
     </button>
-    <ul v-if="isOpen" class="absolute w-full bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10">
+    <ul v-show="isOpen" class="absolute w-full bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10">
       <li
         v-for="option in options"
         :key="option"

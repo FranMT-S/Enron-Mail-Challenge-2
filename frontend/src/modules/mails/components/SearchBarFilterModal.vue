@@ -37,13 +37,13 @@ const dateUntilMin = computed(() => OffSetFromDate(formData.since,0))
 
 const errormsg = ref("")
 const isBetween = ref(false)
-const isPickerOpen = ref(false)
+const isPickerOpen = ref(isActive)
 const selectedDate = ref<Date | undefined | null>(null)
 const selectedType = ref('after')
 const selectOptions = ref(['after','before'])
 
 const handleClickOutside = (event: MouseEvent) => {
-  if (!isPickerOpen.value && formRef.value && !formRef.value.contains(event.target as Node)) {
+  if (isPickerOpen.value && formRef.value && !formRef.value.contains(event.target as Node)) {
     close()
   }
 };
