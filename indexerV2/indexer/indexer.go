@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/models"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/indexer/shared"
 )
 
 type IMailIndexer interface {
@@ -27,7 +28,7 @@ func (indexer *Indexer) IndexMail(FilePath string) (*models.Email, error) {
 	file, err := os.Open(FilePath)
 	if err != nil {
 		fmt.Println(FilePath)
-		return nil, err
+		return nil, shared.MailError(FilePath, err)
 	}
 
 	defer file.Close()
@@ -35,6 +36,7 @@ func (indexer *Indexer) IndexMail(FilePath string) (*models.Email, error) {
 	mail, err := indexer.MailParser.ConvertFileToMail(file)
 	if err != nil {
 		fmt.Println(FilePath)
+		return nil, shared.MailError(FilePath, err)
 	}
 	return mail, err
 }

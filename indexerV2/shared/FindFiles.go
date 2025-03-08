@@ -20,6 +20,7 @@ func FindFilesAsync(dir string, fileChan chan<- string, wg *sync.WaitGroup, sema
 	if semaphore != nil {
 		semaphore.Wait()
 	}
+
 	for _, file := range files {
 		filePath := filepath.Join(dir, file.Name())
 		if file.IsDir() {
@@ -29,6 +30,7 @@ func FindFilesAsync(dir string, fileChan chan<- string, wg *sync.WaitGroup, sema
 			fileChan <- filePath
 		}
 	}
+
 	if semaphore != nil {
 		semaphore.Signal()
 	}

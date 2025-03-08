@@ -46,14 +46,14 @@ func (errHandler *ErrorHandler) Submit(err error) {
 	errHandler.errCh <- err
 }
 
-// logErrorToCSV logs the error and file path to a CSV file.
+// logErrorToCSV logs the error and time .
 func LogErrorToCSV(err error) {
 	f, fileErr := os.OpenFile("logs/error_log.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if fileErr != nil {
 		fmt.Printf("Error opening error log CSV file: %v\n", fileErr)
 		return
 	}
-	defer f.Close() //nolint:errcheck
+	defer f.Close()
 
 	writer := csv.NewWriter(f)
 	defer writer.Flush()
@@ -79,6 +79,6 @@ func LogErrorToCSV(err error) {
 	}
 
 	if err := writer.Write(record); err != nil {
-		fmt.Printf("Error writing error record to CSV log file: %v\n", err)
+		fmt.Printf("Error registering a error record to CSV log file: %v\n", err)
 	}
 }
