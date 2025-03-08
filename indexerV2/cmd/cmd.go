@@ -20,7 +20,7 @@ import (
 var scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
 
 func Start() {
-	var wg, wgBatchMails, wgUploader sync.WaitGroup
+	var wg, wgBatchMails sync.WaitGroup
 	var dir string
 	configProgram := ConfigProgram{}
 	profiler := profiling.Profiler{}
@@ -60,9 +60,10 @@ func Start() {
 		profiler.StartTracerProfiler()
 	}
 
-	mimeIndexer := indexer.NewMimeIndexer()
 	semaphore := shared.NewSemaphore(50)
 
+	mailUploader := indexer.NewMailsUploader(config.CFG.DatabaseName, db.ZincDatabase())
+	mimeIndexer := indexer.NewMimeIndexer()
 	mailsQueoeCh := make(chan *models.Email)
 	mailsBatchQueoeCh := make(chan []*models.Email)
 	filesQueoCh := make(chan string)
@@ -77,19 +78,28 @@ func Start() {
 			Workers: configProgram.workersMails,
 			ErrorCh: errorHandler.GetErrCh(),
 		},
-	)
+	).SetName("Indexer Mails")
 
-	workerpool.SetName("Indexer Mails")
+	uploaderPool := workers.NewWorkerPool(
+		mailUploader.Upload,
+		mailsBatchQueoeCh,
+		nil,
+		workers.WorkerPoolConfig{
+			Workers: configProgram.workersUploaders,
+			ErrorCh: errorHandler.GetErrCh(),
+		},
+	).SetName("Uploader Pool")
+
 	workerpool.Start()
-
 	go indexer.BatchQueoue(configProgram.batchSize, mailsQueoeCh, mailsBatchQueoeCh, &wgBatchMails)
-	go indexer.UploaderPool(configProgram.workersUploaders, config.CFG.DatabaseName, db.ZincDatabase(), mailsBatchQueoeCh, errorHandler.GetErrCh(), &wgUploader)
+	uploaderPool.Start()
 
 	workerpool.Wait()
 	wgBatchMails.Wait()
-	wgUploader.Wait()
+	uploaderPool.Wait()
 	errorHandler.CloseAndWait()
 	workerpool.PrintSuccesfulTask()
+	uploaderPool.PrintSuccesfulTask()
 
 	if configProgram.isProf {
 		profiler.StopMemAndCPUProfiler()
