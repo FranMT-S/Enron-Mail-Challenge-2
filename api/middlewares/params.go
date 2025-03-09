@@ -7,6 +7,7 @@ import (
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/helpers"
 )
 
+// Sanitize the query by removing special characters
 func CleanQueryMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cleanedQuery := url.Values{}

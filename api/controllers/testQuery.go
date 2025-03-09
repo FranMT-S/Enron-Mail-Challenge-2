@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/render"
 )
 
+// Endpoint that return a query of zincsearch
 func TestQueryBuilderfunc(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("query")
 	page, err := middlewares.GetPageFromContext(r)

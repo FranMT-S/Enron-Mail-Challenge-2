@@ -41,6 +41,8 @@ func (reserr ResponseError) Error() string {
 	return string(jsonData)
 }
 
+// Used to log an error inside the ResponseError, which can be accessed via the LogError variable.
+// The logged error does not appear in the JSON response.
 func (resErr ResponseError) WithLogError(err error) *ResponseError {
 	resErr.LogError = err
 	return &resErr
@@ -51,6 +53,13 @@ func (resErr ResponseError) SetStatus(code int) *ResponseError {
 	return &resErr
 }
 
+/*
+RenderJSON sets the status code from the ResponseError and returns the error in JSON format.
+
+- The status code is set based on the ResponseError's StatusCode field.
+- The error message is returned in JSON format with the structure defined by ResponseError.
+- Prints the original error contained in the `LogError` variable to the console for logging purposes.
+*/
 func RenderJSON(w http.ResponseWriter, re *ResponseError) {
 	if re.LogError != nil {
 		log.Println(constants.TextRed, re.LogError.Error(), constants.TextReset)

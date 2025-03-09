@@ -11,14 +11,14 @@ import (
 
 type paginatorFunc func(maxSize int) func(next http.Handler) http.Handler
 
-// add page and size to http context
+// Add page and size to http context,
 var Paginator paginatorFunc = func(maxSize int) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			query := r.URL.Query()
-			pageParam := query.Get(constants.PAGE)
+			pageParam := query.Get(constants.PARAM_PAGE)
 			if pageParam == "" {
-				pageParam = r.Form.Get(constants.PAGE)
+				pageParam = r.Form.Get(constants.PARAM_PAGE)
 			}
 
 			page, err := strconv.Atoi(pageParam)
@@ -26,22 +26,22 @@ var Paginator paginatorFunc = func(maxSize int) func(next http.Handler) http.Han
 				page = 1
 			}
 
-			sizeParam := query.Get(constants.SIZE)
+			sizeParam := query.Get(constants.PARAM_SIZE)
 			if sizeParam == "" {
-				sizeParam = r.Form.Get(constants.SIZE)
+				sizeParam = r.Form.Get(constants.PARAM_SIZE)
 			}
 
 			size, err := strconv.Atoi(sizeParam)
 			if err != nil || size < 1 {
-				size = 100
+				size = constants.PAGINATOR_MINSIZE
 			}
 
 			if size > maxSize {
 				size = maxSize
 			}
 
-			ctx := context.WithValue(r.Context(), constants.PAGE, page)
-			ctx = context.WithValue(ctx, constants.SIZE, size)
+			ctx := context.WithValue(r.Context(), constants.PARAM_PAGE, page)
+			ctx = context.WithValue(ctx, constants.PARAM_SIZE, size)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
@@ -49,7 +49,7 @@ var Paginator paginatorFunc = func(maxSize int) func(next http.Handler) http.Han
 }
 
 func GetPageFromContext(r *http.Request) (int, *apierrors.ResponseError) {
-	page, ok := r.Context().Value(constants.PAGE).(int)
+	page, ok := r.Context().Value(constants.PARAM_PAGE).(int)
 	if !ok {
 		return -1, apierrors.ErrResponsePaginatorNotIsSetup
 	}
@@ -57,7 +57,7 @@ func GetPageFromContext(r *http.Request) (int, *apierrors.ResponseError) {
 }
 
 func GetSizeFromContext(r *http.Request) (int, *apierrors.ResponseError) {
-	size, ok := r.Context().Value(constants.SIZE).(int)
+	size, ok := r.Context().Value(constants.PARAM_SIZE).(int)
 	if !ok {
 		return -1, apierrors.ErrResponsePaginatorNotIsSetup
 	}

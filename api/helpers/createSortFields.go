@@ -6,6 +6,9 @@ import (
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 )
 
+// transform the fields list in a list of string with the format of zincsearch
+//
+// fields element must be the pattern field.asc or field.desc
 func CreateSortFields(fields []string) []string {
 	sortFields := []string{}
 

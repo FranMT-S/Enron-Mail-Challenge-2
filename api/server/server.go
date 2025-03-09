@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/config"
+	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/constants"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/controllers"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/db"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/middlewares"
@@ -32,10 +33,6 @@ func NewServer(port string) *Server {
 	}
 }
 
-type Must struct {
-	MatchAll struct{} `json:"match_all"`
-}
-
 func (server *Server) Start() {
 	server.setupMiddleware()
 	server.setupRoutes()
@@ -54,13 +51,13 @@ func (server *Server) setupMiddleware() {
 }
 
 func (server *Server) setupRoutes() {
-
+	mailsRoutes := routes.MailsRouter(server.emailController)
 	api := chi.NewRouter()
-	api.Mount("/mails", routes.MailsRouter(server.emailController))
+	api.Mount("/mails", mailsRoutes)
 
 	if config.IS_DEVELOPMENT {
 		api.Route("/test", func(r chi.Router) {
-			r.Use(middlewares.Paginator(1000))
+			r.Use(middlewares.Paginator(constants.PAGINATOR_MAXSIZE))
 			r.Get("/query", controllers.TestQueryBuilderfunc)
 		})
 	}

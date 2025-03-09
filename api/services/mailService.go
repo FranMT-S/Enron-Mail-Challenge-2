@@ -21,6 +21,16 @@ func NewMailService(indexDb db.IndexDB) *MailService {
 	}
 }
 
+/*
+Get mails and the total of mails
+
+parameters:
+
+  - querystring the string with the query to analize
+  - page to return
+  - size number of element by page
+  - sort list of the name of fields to order, if the name start with "-" is order descending
+*/
 func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size int, sort []string) (*models.EmailSummaryResponse, *apierrors.ResponseError) {
 	fields := []string{
 		models.FromField, models.ToField, models.DateField,

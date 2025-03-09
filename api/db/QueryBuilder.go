@@ -10,6 +10,16 @@ import (
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 )
 
+/*
+QueryBuilder constructs a query with pagination, field selection, and sorting.
+
+parameters:
+
+  - querystring the string with the query to analize
+  - page to return
+  - size number of element by page
+  - sort list of the name of fields to order, if the name start with "-" is order descending
+*/
 func QueryBuilder(queryString string, page, size int, fields []string, sort []string) (*models.Query, *apierrors.ResponseError) {
 	QueryModel := models.NewQuery()
 	from := (page - 1) * size
@@ -27,13 +37,14 @@ func QueryBuilder(queryString string, page, size int, fields []string, sort []st
 	}
 
 	query = CleanCharacters(query)
-	// replace possible the pattern field without value field:
+	// Replace possible patterns where a field is present without a value, such as "to:"
 	query = strings.ReplaceAll(query, ":", "")
 
 	QueryModel.AddQueryString(query)
 	return QueryModel, nil
 }
 
+// clean special characters
 func CleanCharacters(s string) string {
 	s = strings.TrimSpace(s)
 	// s = strings.ReplaceAll(s, ":", "")
@@ -44,6 +55,9 @@ func CleanCharacters(s string) string {
 	return s
 }
 
+// Return a list of match of the fields in the query
+//
+// example: To:sara, To:(sara Mary)
 func GetFieldsExpresionList(queryString string) (fields []string) {
 	searchFieldsExpresionRegex := regexp.MustCompile(helpers.FieldRegex)
 	matchFieldsExpresionList := searchFieldsExpresionRegex.FindAllString(queryString, -1)
@@ -51,12 +65,13 @@ func GetFieldsExpresionList(queryString string) (fields []string) {
 	return matchFieldsExpresionList
 }
 
+// Remove all match of the fields in the query
 func CleanFieldsExpresion(queryString string) string {
 	searchFieldsExpresionRegex := regexp.MustCompile(helpers.FieldRegex)
 	return searchFieldsExpresionRegex.ReplaceAllString(queryString, "")
-
 }
 
+// Process all fields expresion list and create the type of filter the add the filters to the Query Model
 func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string) *apierrors.ResponseError {
 	layouts := []string{"2006-01-02", "2006/01/02"}
 	rangeFilter := models.DateRange{}
@@ -103,6 +118,8 @@ func processAndAddFilteringQueries(Query *models.Query, fieldsExpresion []string
 	return nil
 }
 
+// Get the information of the type of filter
+// parts is a array with two elements, the key or name of field and the value of the field
 func GetFilterInformation(parts []string) (key, value string, isExclusionFilter bool, operator models.IOperator) {
 	operator = models.AND
 	key = strings.ToLower(parts[0])
