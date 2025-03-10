@@ -24,7 +24,7 @@ const isLoading = ref(true);
 const mailsMap = new Map<string,Mail>()
 const error = ref<Error | undefined>(undefined)
 
-const {getMails,abortPreviousRequest} = useMailService()
+const {getMails} = useMailService()
 const {getEmail} = useMailsStore()
 
 const InitializeData = async (id:string) =>{
@@ -34,7 +34,7 @@ const InitializeData = async (id:string) =>{
     _mails = await getRelatedMails(_mail)
     mail.value =  _mail
     relatedMails.value =  _mails
-    mailsMap.set(_mail.id,_mail)
+    mailsMap.set(id, _mail)
   } catch (err) {
     if(!isAbortError(err))
       isLoading.value = false
@@ -45,17 +45,12 @@ const InitializeData = async (id:string) =>{
 
 const setMail = async (payload:MailSummary) =>{
   try {
+    isLoading.value = true
+    const _mail = await getEmail(payload.id)
 
-    if( mailsMap.has(payload.id)){
-      mail.value = mailsMap.get(payload.id)!
-    }else{
-      isLoading.value = true
-      const _mails = await getEmail(payload.id)
-
-      mailsMap.set(_mails.id,_mails)
-      mail.value = _mails
-      isLoading.value = false
-    }
+    mailsMap.set(_mail.id,_mail)
+    mail.value = _mail
+    isLoading.value = false
   } catch (error) {
     if(!isAbortError(error))
       isLoading.value = false
@@ -76,7 +71,6 @@ const getRelatedMails = async(mail:Mail) =>{
 }
 
 const goIndex = () => {
-  abortPreviousRequest()
   router.push({name: NamesRouter.Index})
 }
 
@@ -86,7 +80,6 @@ onMounted(async () => {
   isLoading.value = false;
 })
 
-onUnmounted(() => abortPreviousRequest())
 
 </script>
 
@@ -102,7 +95,7 @@ onUnmounted(() => abortPreviousRequest())
         class="w-full px-4 flex flex-col py-4   bg-white rounded-r-3xl h-full overflow-auto "
       >
         <MailLoader showText v-if="isLoading"/>
-        <MailDetails v-else-if="mail != null" :mail="mail"/>
+        <MailDetails v-else-if="mail" :mail="mail"/>
         <div v-else>
           <MailsError :error="error" :onlyTitle="true"/>
         </div>

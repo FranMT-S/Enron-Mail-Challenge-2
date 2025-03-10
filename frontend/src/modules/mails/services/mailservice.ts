@@ -1,6 +1,7 @@
 import { API_URL } from "@/constants/varEnviroment";
 import { fetchCustom } from "@/helpers/fetch";
 import { sanitizeInput } from "@/helpers/regex";
+import { CreateSortString } from "@/helpers/sort";
 import type { SortField } from "@/models/Sort";
 
 const baseURL = new URL(API_URL + "/")
@@ -16,11 +17,7 @@ export function fetchGetMails(query:string = "", page:number = 1, size:number=  
   url.searchParams.set('size',size.toString())
 
   if(sortList.length > 0){
-    let sortString = ""
-    for(var s of sortList){
-      sortString += `,${s.field}.${s.sort}`
-    }
-    sortString = sortString.substring(1)
+    let sortString = CreateSortString(sortList)
     url.searchParams.set('sort',sortString)
   }
 

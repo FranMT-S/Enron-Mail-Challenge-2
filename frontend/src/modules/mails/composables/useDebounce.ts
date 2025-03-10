@@ -3,6 +3,7 @@ import { onUnmounted } from "vue";
 
 export function useDebounce(wait:number){
   var timeout:number
+
   const debounce = (fn:ActionFN) => {
     clearInterval(timeout)
     timeout = setTimeout(()=>{

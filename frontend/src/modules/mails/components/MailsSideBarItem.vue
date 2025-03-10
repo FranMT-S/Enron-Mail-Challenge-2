@@ -25,7 +25,7 @@ xTo.value = xToList.value.join(",")
 </script>
 
 <template>
-    <li :class="{'bg-[#580696]': isSelected,'hover:bg-[#ebebff] transition-colors':!isSelected}"
+    <li :class="{'bg-[#580696] selected-item': isSelected,'hover:bg-[#ebebff] transition-colors':!isSelected}"
       class="py-5 border-b px-3 transition relative cursor-pointer"
     >
       <slot></slot>

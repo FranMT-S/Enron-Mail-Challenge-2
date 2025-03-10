@@ -1,6 +1,7 @@
 import type { Mail } from '@/models/Mails';
 import DOMPurify from 'dompurify';
 
+// Extract the name and surname from X-from,x-to
 export const formatXField = (value:string) =>{
   let users = value.split(/<[^>]+>,?\s?|',/)
   if(users.length == 1){

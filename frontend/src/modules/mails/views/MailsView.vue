@@ -8,7 +8,7 @@ import { onMounted, ref, watch } from 'vue';
 import MailsTable from '../components/MailsTable.vue';
 import MailVerticalSplit from '../components/MailVerticalSplit.vue';
 import NavBar from '../components/NavBar.vue';
-import ViewOptionsBar from '../components/OptionsBar.vue';
+import VizualizationOptionsBar from '../components/OptionsBar.vue';
 import Pagination from '../components/Pagination.vue';
 import { useDebounce } from '../composables/useDebounce';
 import { useConfigStore } from '../store/useConfig';
@@ -59,7 +59,7 @@ const onChangeQuery = async (newQuery:string) => {
     await handlerGetMails(newQuery,page.value,itemPerPage.value,[sortValue.value])
 }
 
-const onChangeVisualization = (v:any) =>{
+const onChangeVisualization = () =>{
   resetEmailSummarySelected()
 }
 
@@ -70,7 +70,7 @@ watch([page,itemPerPage],([newPage,newTotalPerPage,]) => {
 })
 
 watch(sortValue,async () => {
-  if(page.value ==1)
+  if(page.value == 1)
     await handlerGetMails(queryString.value,page.value,itemPerPage.value,[sortValue.value])
 
   page.value = 1
@@ -91,7 +91,7 @@ onMounted(async () => {
     <div class="flex-1 px-2 grid grid-rows-[auto_1fr] bg-white shadow-xl rounded-lg" >
       <div class="flex flex-row justify-between mx-[20px] max-mobile:flex-col ">
           <div class="flex items-center justify-end py-[10px] mobile:py-[16px] gap-[4px] mobile:justify-center">
-            <ViewOptionsBar @onchange="onChangeVisualization"/>
+            <VizualizationOptionsBar @onchange="onChangeVisualization"/>
             <SortBySelect />
           </div>
           <Pagination

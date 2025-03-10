@@ -31,6 +31,7 @@ export const formatDateYYYYMMDD = (date:string | Date) => {
   }
 };
 
+/**  Returns a date string in format YYYY-MM-DD with  offset in days. */
 export const OffSetFromDate = (date:Date | undefined | null, daysOffset = 0) =>{
   if(!date)
     return undefined

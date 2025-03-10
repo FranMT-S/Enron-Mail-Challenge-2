@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { isAbortError, ValidateError } from '@/helpers/errors';
+import { navigateToDetails } from '@/helpers/navigate';
 import type { MailsProps } from '@/models/mailProps';
 import type { Mail, MailSummary } from '@/models/Mails';
+import OpenWindowsIcon from '@/modules/components/icons/OpenWindowsIcon.vue';
 import { storeToRefs } from 'pinia';
-import { ref, toRefs, watch } from 'vue';
+import { onMounted, ref, toRefs, watch } from 'vue';
 import { useMailsStore } from '../store/useMailsStore';
 import MailsError from './errors/MailsError.vue';
 import MailDetails from './MailDetails.vue';
 import MailLoader from './MailLoader.vue';
 import MailsSideBarItem from './MailsSideBarItem.vue';
-import OpenWindowsIcon from '@/modules/components/icons/OpenWindowsIcon.vue';
-import { navigateToDetails } from '@/helpers/navigate';
 
 const props =  defineProps<MailsProps>()
 const { emailSummarySelected } = storeToRefs(useMailsStore())
@@ -40,6 +40,15 @@ watch(loading, () =>{
 
 watch(mails, () => {
   resetEmailSummarySelected()
+})
+
+onMounted(() =>{
+  if(emailSummarySelected.value){
+    onSelectMail(emailSummarySelected.value)
+    const selected = document.querySelector('.selected-item')
+    if(selected)
+      selected.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 })
 
 </script>
