@@ -27,13 +27,13 @@ func defineFlag(config *ConfigProgram) {
 	flag.BoolVar(&config.isTracer,
 		"trace",
 		false,
-		"Activate memory and cpu profiling. It is recommended not to use it together with trace profiling for best result. default: false.",
+		"Activate trace profiling. It is recommended not to use it together with CPU and memory profiling  for best result.default: false.",
 	)
 
 	flag.BoolVar(&config.isProf,
 		"prof",
 		false,
-		"Activate trace profiling. It is recommended not to use it together with CPU and memory profiling  for best result.default: false.",
+		"Activate memory and cpu profiling. It is recommended not to use it together with trace profiling for best result. default: false.",
 	)
 
 	flag.Parse()
