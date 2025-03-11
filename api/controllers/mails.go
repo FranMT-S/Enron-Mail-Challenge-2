@@ -9,7 +9,6 @@ import (
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/helpers"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/middlewares"
-	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -29,75 +28,51 @@ func NewMailController(emailService services.IMailService) *MailController {
 }
 
 func (mc MailController) GetMails(w http.ResponseWriter, r *http.Request) {
-	errCh := make(chan *apierrors.ResponseError)
-	resCh := make(chan *models.EmailSummaryResponse)
-
 	ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
 	defer cancel()
 
-	go func() {
-		query := r.URL.Query().Get("query")
-		sortParam := r.URL.Query().Get("sort")
-		sort := strings.Split(sortParam, ",")
-		page, err := middlewares.GetPageFromContext(r)
-		if err != nil {
-			errCh <- err
-			return
-		}
+	query := r.URL.Query().Get("query")
+	sortParam := r.URL.Query().Get("sort")
+	sort := strings.Split(sortParam, ",")
+	page, err := middlewares.GetPageFromContext(r)
+	if err != nil {
+		apierrors.RenderJSON(w, err)
+		return
+	}
 
-		size, err := middlewares.GetSizeFromContext(r)
-		if err != nil {
-			errCh <- err
-			return
-		}
+	size, err := middlewares.GetSizeFromContext(r)
+	if err != nil {
+		apierrors.RenderJSON(w, err)
+		return
+	}
 
-		sortFields := helpers.CreateSortFields(sort)
+	sortFields := helpers.CreateSortFields(sort)
 
-		if len(sortFields) == 0 || sortParam == "" {
-			sortFields = []string{"-date"}
-		}
+	if len(sortFields) == 0 || sortParam == "" {
+		sortFields = []string{"-date"}
+	}
 
-		hits, err := mc.emailService.GetMailsHitsAndTotal(query, page, size, sortFields)
-		if err != nil {
-			errCh <- err
-			return
-		}
+	hits, err := mc.emailService.GetMailsHitsAndTotal(ctx, query, page, size, sortFields)
 
-		resCh <- hits
-	}()
-
-	response(resCh, errCh, ctx, w, r)
+	response(hits, err, w, r)
 }
 
 func (mc MailController) GetMail(w http.ResponseWriter, r *http.Request) {
-	errCh := make(chan *apierrors.ResponseError)
-	resCh := make(chan *models.Email)
+
 	ctx, cancel := context.WithTimeout(r.Context(), 20*time.Second)
 	defer cancel()
-	go func() {
-		id := chi.URLParam(r, "id")
-		hits, err := mc.emailService.GetMailByID(id)
-		if err != nil {
-			errCh <- err
-			return
-		}
-		resCh <- hits
-	}()
 
-	response(resCh, errCh, ctx, w, r)
+	id := chi.URLParam(r, "id")
+	hits, err := mc.emailService.GetMailByID(ctx, id)
+
+	response(hits, err, w, r)
 }
 
-func response[T any](responseCh chan T, errCh chan *apierrors.ResponseError, ctx context.Context, w http.ResponseWriter, r *http.Request) {
-	select {
-	case hits := <-responseCh:
-		render.JSON(w, r, hits)
-	case err := <-errCh:
+func response[T any](response T, err *apierrors.ResponseError, w http.ResponseWriter, r *http.Request) {
+	if err != nil {
 		apierrors.RenderJSON(w, err)
-	case <-ctx.Done():
-		if ctx.Err() == context.Canceled {
-			apierrors.RenderJSON(w, apierrors.ErrResponseRequestCancelled)
-		} else if ctx.Err() == context.DeadlineExceeded {
-			apierrors.RenderJSON(w, apierrors.ErrResponseRequestTimeOut)
-		}
+		return
 	}
+
+	render.JSON(w, r, response)
 }

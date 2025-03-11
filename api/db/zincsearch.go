@@ -42,7 +42,7 @@ func NewZinchSearchDB() *zinchsearchDB {
 	}
 }
 
-func (zin *zinchsearchDB) SearchMails(query models.Query) (*models.Hits[models.Email], *apierrors.ResponseError) {
+func (zin *zinchsearchDB) SearchMails(ctx context.Context, query models.Query) (*models.Hits[models.Email], *apierrors.ResponseError) {
 	var err error
 	var bytesJson []byte
 	url := config.ZINC_SEARCH_URL
@@ -55,7 +55,7 @@ func (zin *zinchsearchDB) SearchMails(query models.Query) (*models.Hits[models.E
 
 	reader := bytes.NewReader(bytesJson)
 
-	res, errRes := zin.doRequest("POST", url, reader)
+	res, errRes := zin.zincDoRequest(ctx, "POST", url, reader)
 
 	if errRes != nil {
 		return nil, errRes
@@ -78,9 +78,9 @@ type ZincError struct {
 	Message string `json:"message"`
 }
 
-func (zin *zinchsearchDB) SearchMail(id string) (*models.Hit[models.Email], *apierrors.ResponseError) {
+func (zin *zinchsearchDB) SearchMail(ctx context.Context, id string) (*models.Hit[models.Email], *apierrors.ResponseError) {
 	url := config.ZINC_GET_DOCUMENT_URL + "/" + id
-	res, errRes := zin.doRequest("GET", url, nil)
+	res, errRes := zin.zincDoRequest(ctx, "GET", url, nil)
 	if errRes != nil {
 		return nil, errRes
 	}
@@ -97,7 +97,8 @@ func (zin *zinchsearchDB) SearchMail(id string) (*models.Hit[models.Email], *api
 	return HitResponse, nil
 }
 
-func (zinDB zinchsearchDB) doRequest(method string, url string, body io.Reader) (*http.Response, *apierrors.ResponseError) {
+func (zinDB zinchsearchDB) zincDoRequest(ctx context.Context, method string, url string, body io.Reader) (*http.Response, *apierrors.ResponseError) {
+	var response *http.Response = nil
 
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -105,29 +106,51 @@ func (zinDB zinchsearchDB) doRequest(method string, url string, body io.Reader) 
 		return nil, errRes
 	}
 
+	errRes := zinDB.httpDo(ctx, req, func(res *http.Response, err error) *apierrors.ResponseError {
+		if err != nil {
+			if errRes := isConnectionError(err); errRes != nil {
+				return errRes.WithLogError(err)
+			}
+
+			return apierrors.ErrResponseRequestNotProcessed.WithLogError(err)
+		}
+
+		if res.StatusCode != http.StatusOK {
+			bodyError, _ := io.ReadAll(res.Body)
+			if errRes := IsResponseErrorFromZincSearch(bodyError); errRes != nil {
+				return errRes
+			}
+
+			errRes := apierrors.ErrResponseRequestNotProcessed.WithLogError(apierrors.ErrDoRequestFailed).SetStatus(res.StatusCode)
+			return errRes
+		}
+
+		response = res
+		return nil
+	})
+
+	return response, errRes
+}
+
+// Executed a request with context and return the error if timeout or cancel is call or if the request failed
+//
+// f is a callback to do something with the response or error.
+func (zinDB zinchsearchDB) httpDo(ctx context.Context, req *http.Request, f func(*http.Response, error) *apierrors.ResponseError) *apierrors.ResponseError {
+	errCh := make(chan *apierrors.ResponseError, 1)
+	req = req.WithContext(ctx)
 	ZincHeader(req)
 
-	res, err := zinDB.client.Do(req)
+	go func() { errCh <- f(zinDB.client.Do(req)) }()
 
-	if err != nil {
-		if errRes := isConnectionError(err); errRes != nil {
-			return nil, errRes.WithLogError(err)
+	select {
+	case <-ctx.Done():
+		if ctx.Err() == context.Canceled {
+			return apierrors.ErrResponseRequestCancelled
 		}
-
-		return nil, apierrors.ErrResponseRequestNotProcessed.WithLogError(err)
+		return apierrors.ErrResponseRequestTimeOut
+	case errRes := <-errCh:
+		return errRes
 	}
-
-	if res.StatusCode != http.StatusOK {
-		bodyError, _ := io.ReadAll(res.Body)
-		if errRes := IsResponseErrorFromZincSearch(bodyError); errRes != nil {
-			return nil, errRes
-		}
-
-		errRes := apierrors.ErrResponseRequestNotProcessed.WithLogError(apierrors.ErrDoRequestFailed).SetStatus(res.StatusCode)
-		return nil, errRes
-	}
-
-	return res, nil
 }
 
 func isConnectionError(err error) *apierrors.ResponseError {

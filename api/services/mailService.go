@@ -1,14 +1,16 @@
 package services
 
 import (
+	"context"
+
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/db"
 	apierrors "github.com/FranMT-S/Enron-Mail-Challenge-2/backend/errors"
 	"github.com/FranMT-S/Enron-Mail-Challenge-2/backend/models"
 )
 
 type IMailService interface {
-	GetMailsHitsAndTotal(query string, page int, size int, sort []string) (*models.EmailSummaryResponse, *apierrors.ResponseError)
-	GetMailByID(id string) (*models.Email, *apierrors.ResponseError)
+	GetMailsHitsAndTotal(ctx context.Context, query string, page int, size int, sort []string) (*models.EmailSummaryResponse, *apierrors.ResponseError)
+	GetMailByID(ctx context.Context, id string) (*models.Email, *apierrors.ResponseError)
 }
 
 type MailService struct {
@@ -31,10 +33,14 @@ parameters:
   - size number of element by page
   - sort list of the name of fields to order, if the name start with "-" is order descending
 */
-func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size int, sort []string) (*models.EmailSummaryResponse, *apierrors.ResponseError) {
+func (ms MailService) GetMailsHitsAndTotal(ctx context.Context, queryString string, page int, size int, sort []string) (*models.EmailSummaryResponse, *apierrors.ResponseError) {
 	fields := []string{
-		models.FromField, models.ToField, models.DateField,
-		models.SubjectField, models.XToField, models.XFromField,
+		models.FromField,
+		models.ToField,
+		models.DateField,
+		models.SubjectField,
+		models.XToField,
+		models.XFromField,
 	}
 
 	Query, err := db.QueryBuilder(queryString, page, size, fields, sort)
@@ -42,7 +48,7 @@ func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size in
 		return nil, err
 	}
 
-	hits, err := ms.indexDB.SearchMails(*Query)
+	hits, err := ms.indexDB.SearchMails(ctx, *Query)
 	if err != nil {
 		return nil, err
 	}
@@ -70,8 +76,8 @@ func (ms MailService) GetMailsHitsAndTotal(queryString string, page int, size in
 	return emailsResponse, nil
 }
 
-func (ms MailService) GetMailByID(id string) (*models.Email, *apierrors.ResponseError) {
-	hit, err := ms.indexDB.SearchMail(id)
+func (ms MailService) GetMailByID(ctx context.Context, id string) (*models.Email, *apierrors.ResponseError) {
+	hit, err := ms.indexDB.SearchMail(ctx, id)
 	if err != nil {
 		return nil, err
 	}
