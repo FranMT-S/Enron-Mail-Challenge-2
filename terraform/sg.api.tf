@@ -10,5 +10,12 @@ resource "aws_security_group" "sg_allow_api" {
     cidr_blocks = ["0.0.0.0/0"]  
   }
 
+  ingress {
+    from_port   = 3080
+    to_port     = 3080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  
+  }
+
 }
 

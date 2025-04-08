@@ -12,7 +12,7 @@ resource "aws_instance" "ec2-mails" {
   }
 
   root_block_device {
-    volume_size = 25 
+    volume_size = 15 
     volume_type = "gp2"
   }
 

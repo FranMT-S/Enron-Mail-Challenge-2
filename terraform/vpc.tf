@@ -19,7 +19,6 @@ resource "aws_subnet" "subnet_mails_client" {
   map_public_ip_on_launch = true
 }
 
-
 resource "aws_route_table" "all_trafic" {
   vpc_id = aws_vpc.vpc_mails.id
   route {
@@ -29,4 +28,9 @@ resource "aws_route_table" "all_trafic" {
   tags = {
     Name = "route-table-mails"
   }
+}
+
+resource "aws_route_table_association" "subnet_mails_client_association" {
+  subnet_id      = aws_subnet.subnet_mails_client.id
+  route_table_id = aws_route_table.all_trafic.id
 }
